@@ -3,7 +3,8 @@
 ### Files
 data/
 vscode/
-
+.Rproj.user/
+*.Rproj
 
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
@@ -230,3 +231,4 @@ xcuserdata
 ## Bitlab Directories
 media/
 db.sqlite3
+.Rproj.user
