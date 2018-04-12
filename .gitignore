@@ -5,6 +5,7 @@ data/
 vscode/
 .Rproj.user/
 *.Rproj
+test_*
 
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
