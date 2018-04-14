@@ -9,6 +9,24 @@ dev.off()
 ### Load DEA_functions.R
 source("DEA_functions.R")
 
+# 1 - RCC Data directory
+# 2 - RLF Filename (Only name (Base on Arg1?))
+# 3 - KEY OF INTEREST - For all
+# 4 - LABEL OF SUCH KEY - For all
+# 5 - VALUES OF SUCH KEY TO COMPARE - For all 
+# 6 - FIELD OF VIEW THRESHOLD - For FOV plot
+# 7 - BINDING DENSITY THRESHOLDS (min and max) - For BD plot
+# 8 - P VALUE THRESHOLD - For DEA & Pathway Enrichment
+# 9 - LOG FC THRESHOLD - For DEA & Pathway Enrichment
+# 10 - Q VALUE THRESHOLD - For Pathway Enrichment
+# 11 - SEED - Optional
+
+### TODO ###
+# - Move all outputs (CSV, RDS) to /output
+# - Make report in RMarkdown to /reports
+# - Move all images (PNG) to /images
+# - Move RMarkdown output to /doc
+
 ### Argument check (disabled by now)
 # PATHS
 data.directory <- "data" 
@@ -16,23 +34,26 @@ rcc.directory <- file.path(data.directory, "PanCancer Pathways - 57")
 rlf.filename <- "NS_CancerPath_C2535.rlf"
 
 # CONSTANTS
-KEY.OF.INTEREST <- 1        # Param
-LABEL.OF.INTEREST <- "PCR"  # Param
+KEY.OF.INTEREST <- 1
+LABEL.OF.INTEREST <- "PCR"
 VALUES.OF.KEY.OF.INTEREST <- c("0","1")
-SEED <- 12345
 FOV.THRESHOLD <- 80 
 BD.THRESHOLDS <- c(0.05, 2.25)
-P-VALUE.THRESHOLD <- 0.05
+P.VALUE.THRESHOLD <- 0.05
 LOG.FC.THRESHOLD <- 1
 Q.VALUE.THRESHOLD <- 1e-10
+SEED <- 12345
+
 # PARAM DEPENDANT
-LOD.THRESHOLD <- (100-FOV.THRESHOLD)/100
 
 # SETUP
 set.seed(SEED)
 keys.vector <- unlist(lapply(seq_len(KEY.OF.INTEREST), function(x) paste("key",x,sep = "")), use.names = FALSE)
 key.label <- tail(keys.vector, 1)
+LOD.THRESHOLD <- (100-FOV.THRESHOLD)/100 # Dependant of FOV.THRESHOLD
 OUTPUT.NAME <- paste(LABEL.OF.INTEREST, VALUES.OF.KEY.OF.INTEREST[1], VALUES.OF.KEY.OF.INTEREST[2], sep = "-")
+
+
 ### ------------------------
 ### Load RCC files. Build counts matrix
 ### ------------------------
@@ -160,10 +181,10 @@ design <- as.formula(paste("~", key.label, sep = ""))
 rownames(metadata) <- metadata$Sample.name
 
 dea.o <- getDE(ncounts = round(ncounts), metadata = metadata, design = design)
-dea.p <- dea.o %>% dplyr::filter(padj < P-VALUE.THRESHOLD) %>% arrange(-log2FoldChange)
+dea.p <- dea.o %>% dplyr::filter(padj < P.VALUE.THRESHOLD) %>% arrange(-log2FoldChange)
 
 # Save DEA Results
-P.VALUE.STRING <- paste("PVALUE", P-VALUE.THRESHOLD, sep = "-")
+P.VALUE.STRING <- paste("PVALUE", P.VALUE.THRESHOLD, sep = "-")
 DEA.OUTPUT.NAME <- paste(OUTPUT.NAME, "DEA.csv", sep = "_")
 DEA.SIGNIFICATIVE.OUTPUT.NAME <- paste(OUTPUT.NAME, P.VALUE.STRING, "DEA.csv", sep = "_")
 
@@ -177,7 +198,7 @@ write_csv(dea.p, DEA.SIGNIFICATIVE.OUTPUT.NAME)
 tab = data.frame(logFC = dea.o$log2FoldChange, negLogPval = -log10(dea.o$padj))
 tab2 = data.frame(logFC = dea.o$log2FoldChange, negLogPval = -log10(dea.o$padj), Gene=dea.o$gene.name)
 
-plot.Volcano(tab, tab2, LOG.FC.THRESHOLD, P-VALUE.THRESHOLD, plot.title = "Volcano Plot")
+plot.Volcano(tab, tab2, LOG.FC.THRESHOLD, P.VALUE.THRESHOLD, plot.title = "Volcano Plot")
 
 ### ------------------------
 ### Pathway analysis
@@ -207,7 +228,7 @@ ENRICHMENT.OVER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-OVER.csv", sep = "_")
 ENRICHMENT.UNDER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-UNDER.csv", sep = "_")
 
 # Enrich - All
-enrich.rs <- enrich.cp(res, LABEL.OF.INTEREST, type="all", pval.threshold = P-VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
+enrich.rs <- enrich.cp(res, LABEL.OF.INTEREST, type="all", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.summary <- enrich.rs$summary %>% arrange(p.adjust)
 enrich.rs.summary <- convert.enriched.ids(enrich.rs.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrich.rs.summary, path = ENRICHMENT.ALL.OUTPUT)
@@ -215,13 +236,13 @@ write_csv(x = enrich.rs.summary, path = ENRICHMENT.ALL.OUTPUT)
 ### -- # Faster to get over and under from the all??? # -- ###
 
 # Enrich - Over
-enrich.rs.over <- enrich.cp(res, LABEL.OF.INTEREST, type="over", pval.threshold = P-VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
+enrich.rs.over <- enrich.cp(res, LABEL.OF.INTEREST, type="over", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.over.summary <- enrich.rs.over$summary %>% arrange(p.adjust)
 enrich.rs.over.summary <- convert.enriched.ids(enrich.rs.over.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrich.rs.over.summary, path = ENRICHMENT.OVER.OUTPUT)
 
 # Enrich - Under
-enrich.rs.under <- enrich.cp(res, LABEL.OF.INTEREST, type="under", pval.threshold = P-VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
+enrich.rs.under <- enrich.cp(res, LABEL.OF.INTEREST, type="under", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.under.summary <- enrich.rs.under$summary %>% arrange(p.adjust)
 enrich.rs.under.summary <- convert.enriched.ids(enrich.rs.under.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 write_csv(x = enrich.rs.under.summary, path = ENRICHMENT.UNDER.OUTPUT)
@@ -261,4 +282,8 @@ enrich.kegg.all.summary.filtered
 for(pathid in enrich.kegg.all.summary.filtered$ID){
   viewkeggpath(path=pathid, enrichment = enrich.rs.summary, dea.p = dea.p)
 }
+
+### ------------------------
+### pathfindR | https://cran.r-project.org/web/packages/pathfindR/index.html
+### ------------------------
 

@@ -38,6 +38,12 @@ package.check <- lapply(c(packages, bioconductor.packages), require, character.o
 ### Helpers
 ### ------------------------
 
+my.file.rename <- function(from, to) {
+  todir <- dirname(to)
+  if (!isTRUE(file.info(todir)$isdir)) dir.create(todir, recursive=TRUE)
+  file.rename(from = from,  to = to)
+}
+
 is.positive = function(column) {
   return(grepl("Pos", column))
 }
