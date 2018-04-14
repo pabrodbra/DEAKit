@@ -4,7 +4,14 @@
 data/
 vscode/
 .Rproj.user/
+results/
+/*.xml
+/*.csv
+/*.rds
+/*.png
 *.Rproj
+*.RData
+*.Rhistory
 test_*
 
 ### PyCharm ###

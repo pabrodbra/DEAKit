@@ -92,11 +92,23 @@ hk.factor = function(counts, lod) {
 ### ------------------------
 
 ### Load data + Extract metadata
-extract.rcc.metadata <- function(rcc.directory, keys.vector){
+remove.rows.with.na.and.condition.in.columns <- function(df, columns, condition = c("0","1")) {
+  cond1 <- (df[, columns] == condition[1])
+  cond2 <- (df[, columns] == condition[2])
+  ret <- df[as.logical(rowSums(cbind(cond1, cond2))), ]
+  complete.rows <- complete.cases(ret[][columns])
+  return(ret[complete.rows, ])
+}
+
+
+extract.rcc.metadata <- function(rcc.directory, keys.vector, condition = c("0","1")){
+  key.label <- tail(keys.vector, n=1)
   metadata <- data.frame(fname=list.files(rcc.directory, pattern="*.RCC")) %>%
     tidyr::separate(fname, c("Sample.name", keys.vector), sep="_", remove=F) %>%
-    tidyr::separate(tail(keys.vector, n=1), c(tail(keys.vector, n=1), "ext"), sep="\\.") %>%
-    dplyr::select(c("fname","Sample.name", keys.vector))
+    tidyr::separate(key.label, c(key.label, "ext"), sep="\\.") %>%
+    dplyr::select(c("fname","Sample.name", key.label))
+  
+  metadata <- remove.rows.with.na.and.condition.in.columns(metadata, key.label, condition)
   
   return(metadata)
 }
@@ -192,23 +204,8 @@ boxplot.count.matrix <- function(counts, title.label = "Genes Expression"){
     theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5,size = 5))
 }
 
-# Deprecate...
-boxplot.condition <- function(counts, condition, title.label = ""){
-  condition.genes <- counts[grepl("Housekeeping", rownames(counts)),]
-  condition.genes.df <- as.data.frame(condition.genes)
-  condition.genes.tidy <- tidyr::gather(condition.genes.df)
-  colnames(condition.genes.tidy)<-c("sample","count")
-  
-  ggplot(condition.genes.tidy, aes(sample, count)) + geom_boxplot(colour = "black", fill = "#CCCCCC",outlier.size = 0.5) +
-    scale_y_continuous(trans = "log2") + 
-    xlab("Genes") + ggtitle(title.label) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5,size = 5) ) +
-    geom_smooth(se=T, aes(group=1))+
-    ylab("counts")
-}
-
 boxplot.multiple.conditions <- function(counts, conditions, 
-                                        title.label = "", vjust = 0.5){
+                                        title.label = ""){
   all.conditions <- do.call(rbind, lapply(conditions, function (x) counts[grepl(x, rownames(counts)),]))
   all.conditions.df <- as.data.frame(all.conditions)
   all.conditions.tidy <-tidyr::gather(all.conditions.df)
@@ -216,7 +213,7 @@ boxplot.multiple.conditions <- function(counts, conditions,
   
   ggplot(all.conditions.tidy, aes(sample, count)) + geom_boxplot(colour = "black", fill = "#56B4E9",outlier.size = 0.5) +
     scale_y_continuous(trans = "log2") + 
-    xlab("Genes") + ggtitle(title.label) +
+    xlab("Samples") + ylab("Counts") + ggtitle(title.label) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5,size = 5))+
     geom_smooth(se=T, aes(group=1))
 }
@@ -248,13 +245,15 @@ pca.loadings = function(object, ntop = 500) {
   return(pca)
 }
 
-plotPCA = function(comps, nc1, nc2, colorby) {
+plotPCA = function(comps, nc1, nc2, colorby, legend.label = "Key", plot.title = "") {
   c1str = paste0("PC", nc1)
   c2str = paste0("PC", nc2)
   ggplot(comps, aes_string(c1str, c2str, color=colorby)) + geom_point() + theme_bw() + 
     xlab(paste0(c1str, ": ", round(pc$percent.var[nc1] * 100),  "% variance")) +
     ylab(paste0(c2str, ": ", round(pc$percent.var[nc2] * 100), "% variance")) +
     theme(aspect.ratio=1) +
+    ggtitle(plot.title) +
+    labs(color=legend.label) +
     scale_colour_brewer(palette="Set1")
 }
 
@@ -286,18 +285,19 @@ getDE.raw <- function(ncounts, metadata, design){ ## Gets the same DE data, less
   return(res)
 }
 
-plot.Volcano <- function(tab, tab2, lfc, pval){
+plot.Volcano <- function(tab, tab2, lfc.threshold, pval.threshold, plot.title = ""){
   par(mar = c(5, 4, 4, 4))
   plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]~fold~change), ylab = expression(-log[10]~pvalue))
+  title(main = plot.title)
   # signGenes <- (abs(tab$logFC) > lfc & tab$negLogPval > -log10(pval))
-  points(tab[(abs(tab$logFC) > lfc), ], pch = 16, cex = 0.8, col = "orange") 
-  points(tab[(tab$negLogPval > -log10(pval)), ], pch = 16, cex = 0.8, col = "green") 
-  points(tab[(abs(tab$logFC) > lfc & tab$negLogPval > -log10(pval)), ], pch = 16, cex = 0.8, col = "red") 
-  abline(h = -log10(pval), col = "green3", lty = 2) 
-  abline(v = c(-lfc, lfc), col = "blue", lty = 2) 
-  mtext(paste("pval =", pval), side = 4, at = -log10(pval), cex = 0.8, line = 0.5, las = 1) 
-  mtext(c(paste("-", lfc, "fold"), paste("+", lfc, "fold")), side = 3, at = c(-lfc, lfc), cex = 0.8, line = 0.5)
-  with(subset(tab2, negLogPval > -log10(pval) & abs(logFC)>1), textxy(logFC, negLogPval, labs=Gene, cex=.4))
+  points(tab[(abs(tab$logFC) > lfc.threshold), ], pch = 16, cex = 0.8, col = "orange") 
+  points(tab[(tab$negLogPval > -log10(pval.threshold)), ], pch = 16, cex = 0.8, col = "green") 
+  points(tab[(abs(tab$logFC) > lfc.threshold & tab$negLogPval > -log10(pval.threshold)), ], pch = 16, cex = 0.8, col = "red") 
+  abline(h = -log10(pval.threshold), col = "green3", lty = 2) 
+  abline(v = c(-lfc.threshold, lfc.threshold), col = "blue", lty = 2) 
+  mtext(paste("pval =", pval.threshold), side = 4, at = -log10(pval.threshold), cex = 0.8, line = 0.5, las = 1) 
+  mtext(c(paste("-", lfc.threshold, "fold"), paste("+", lfc.threshold, "fold")), side = 3, at = c(-lfc.threshold, lfc.threshold), cex = 0.8, line = 0.5)
+  with(subset(tab2, negLogPval > -log10(pval.threshold) & abs(logFC)>1), textxy(logFC, negLogPval, labs=Gene, cex=.4))
 }
 
 ### ------------------------
@@ -315,11 +315,11 @@ summarize.cp = function(res, comparison) {
   return(summaries)
 }
 
-enrich.cp = function(res, comparison, type="over") {
+enrich.cp = function(res, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
   res = res %>% data.frame()  %>% left_join(entrez, by = "refseq_mrna") %>% filter(!is.na(entrezgene))
   universe = res$entrezgene 
   if(type=="all"){
-    res <- res %>% filter(padj < 0.05)
+    res <- res %>% filter(padj < pval.threshold)
     genes = res$entrezgene
     # Let the background genes be all the genes not just the genes in the gene expression panel
     mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
@@ -339,7 +339,7 @@ enrich.cp = function(res, comparison, type="over") {
     return(all)
   }
   if(type=="over"){
-    res.over <- res %>% filter(log2FoldChange > 1 & padj < 0.05)
+    res.over <- res %>% filter(log2FoldChange > lfc.threshold & padj < pval.threshold)
     genes = res.over$entrezgene
     # Let the background genes be all the genes not just the genes in the gene expression panel
     mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
@@ -360,7 +360,7 @@ enrich.cp = function(res, comparison, type="over") {
   }
   
   if(type=="under"){
-    res.under <- res %>% filter(log2FoldChange < -1 & padj < 0.05)
+    res.under <- res %>% filter(log2FoldChange < -lfc.threshold & padj < pval.threshold)
     genes = res.under$entrezgene
     mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
     cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
@@ -387,6 +387,11 @@ convert.enriched.ids = function(res, entrezsymbol) {
     group_by(ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue, Count, ont, comparison) %>%
     summarise(geneID = paste(geneID, collapse = "/"), symbol = paste(hgnc_symbol, collapse = "/"))
   return(res)
+}
+
+# Enrichment Summary Kegg filter
+ontology.enrichment.qval.filter <- function(enrichment.summary, ontology = "kg", qval = 0.05){
+  return(enrichment.summary[(enrichment.summary$ont == ontology & enrichment.summary$qvalue < qval),])
 }
 
 # View KEGG Path
