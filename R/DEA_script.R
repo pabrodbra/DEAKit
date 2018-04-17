@@ -302,9 +302,11 @@ for(pathid in enrich.kegg.all.summary.filtered$ID){
 ### ------------------------
 
 
-### R Markdown Report --- TO BE FIXED
+### ------------------------
+### R Markdown Report --- FIGURE OUT TEXT AND PARAMS WANTED FOR THIS REPORT...
+### ------------------------
 
-#Sys.setenv(RSTUDIO_PANDOC="/usr/lib/rstudio/bin/pandoc")
+# Make all plots as variables, no need to recalculate...
 MARKDOWN.PATH <- "reports/DEA_report.Rmd"
 MARKDOWN.OUTPUT <- "../docs/DEA_report.html"
 markdown.params <- list(
@@ -315,3 +317,7 @@ markdown.params <- list(
 rmarkdown::render("reports/DEA_report.Rmd", output_file = MARKDOWN.OUTPUT)
 #rmarkdown::render("reports/DEA_report.Rmd", params = params.pdf, output_file = output.pdf)
 #knitr::knit(MARKDOWN.PATH, output= "output.pdf")
+
+### ------------------------
+### Shiny App - Web ?? or Portable (RInno?? or https://www.r-bloggers.com/deploying-desktop-apps-with-r/) (https://stackoverflow.com/questions/33513544/deploying-r-shiny-app-as-a-standalone-application) 
+### ------------------------

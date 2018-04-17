@@ -206,7 +206,7 @@ boxplot.count.matrix <- function(counts, title.label = "Genes Expression"){
   current.count$sample<-gsub("X","",current.count$sample)
   ggplot(current.count, aes(sample, count)) + geom_boxplot(colour = "black", fill = "#56B4E9",outlier.size = 0.5) +
     scale_y_continuous(trans = "log2") + 
-    xlab("") + ggtitle(title.label) +
+    xlab("Samples") + ylab("Counts") + ggtitle(title.label) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5,size = 5))
 }
 
