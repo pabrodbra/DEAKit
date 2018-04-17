@@ -5,7 +5,7 @@ orgdb = "org.Hs.eg.db"
 biomart_dataset = "hsapiens_gene_ensembl"
 keggname = "hsa"
 
-packages <- c("dplyr", "readr", "matrixStats", "tidyr","ggplot2", "cowplot", "rgl", "calibrate")
+packages <- c("dplyr", "readr", "matrixStats", "tidyr","ggplot2", "cowplot", "rgl", "calibrate", "rmarkdown")
 diff.packages <- setdiff(packages, rownames(installed.packages()))
 if (length(diff.packages) > 0) {
   install.packages(diff.packages, dependencies = TRUE)  
@@ -401,7 +401,7 @@ ontology.enrichment.qval.filter <- function(enrichment.summary, ontology = "kg",
 }
 
 # View KEGG Path
-viewkeggpath <- function(path, enrichment, dea.p){
+viewkeggpath <- function(path, enrichment, dea.p, output = "."){
   # Get the genes in path from the enrichment summary
   genesymbols <- strsplit(as.character(enrichment[which(enrichment$ID ==path),12]), split = "/")[[1]]
   geneids <- strsplit(as.character(enrichment[which(enrichment$ID ==path),11]), split = "/")[[1]]
@@ -414,7 +414,7 @@ viewkeggpath <- function(path, enrichment, dea.p){
   gene.vector <- kk$log2FoldChange
   names(gene.vector) <- kk$geneid
   
-  pathview(gene.data=gene.vector, pathway.id=path, species="hsa", limit=list(gene=max(abs(gene.vector)), cpd=1))
+  pathview(gene.data=gene.vector, pathway.id=path, species="hsa", limit=list(gene=max(abs(gene.vector)), cpd=1), kegg.dir = output)
 }
 
 ########################################

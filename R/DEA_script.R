@@ -7,7 +7,13 @@ rm(list = ls())
 dev.off()
 
 ### Load DEA_functions.R
-source("DEA_functions.R")
+source("R/DEA_functions.R")
+
+args <- commandArgs(trailingOnly = TRUE)
+
+#if (length(args)>=10 && length(args)<=12) {
+#  stop("***USAGE*** Rscript RACC_script.R <RACC_results_directory> <RACC_report_directory> <Absolute_RACKit_src_r>\n", call.=FALSE)
+#}
 
 # 1 - RCC Data directory
 # 2 - RLF Filename (Only name (Base on Arg1?))
@@ -20,9 +26,9 @@ source("DEA_functions.R")
 # 9 - LOG FC THRESHOLD - For DEA & Pathway Enrichment
 # 10 - Q VALUE THRESHOLD - For Pathway Enrichment
 # 11 - SEED - Optional
+# 12 - OUTPUT - Optional
 
 ### TODO ###
-# - Move all outputs (CSV, RDS) to /output
 # - Make report in RMarkdown to /reports
 # - Move all images (PNG) to /images
 # - Move RMarkdown output to /doc
@@ -32,6 +38,7 @@ source("DEA_functions.R")
 data.directory <- "data" 
 rcc.directory <- file.path(data.directory, "PanCancer Pathways - 57")
 rlf.filename <- "NS_CancerPath_C2535.rlf"
+base.output.path <- "output/"
 
 # CONSTANTS
 KEY.OF.INTEREST <- 1
@@ -51,8 +58,8 @@ set.seed(SEED)
 keys.vector <- unlist(lapply(seq_len(KEY.OF.INTEREST), function(x) paste("key",x,sep = "")), use.names = FALSE)
 key.label <- tail(keys.vector, 1)
 LOD.THRESHOLD <- (100-FOV.THRESHOLD)/100 # Dependant of FOV.THRESHOLD
-OUTPUT.NAME <- paste(LABEL.OF.INTEREST, VALUES.OF.KEY.OF.INTEREST[1], VALUES.OF.KEY.OF.INTEREST[2], sep = "-")
-
+BASE.OUTPUT.NAME <- paste(base.output.path, LABEL.OF.INTEREST, sep = "")
+OUTPUT.NAME <- paste(BASE.OUTPUT.NAME, VALUES.OF.KEY.OF.INTEREST[1], VALUES.OF.KEY.OF.INTEREST[2], sep = "-")
 
 ### ------------------------
 ### Load RCC files. Build counts matrix
@@ -145,8 +152,8 @@ filtered.names <- rownames(ncounts)
 filter.out.genes <- all.names[all.names %!in% filtered.names]
 
 # Save metadata dataframe and the normalised counts matrix
-RDS.METADATA.OUTPUT <- paste("BMI", OUTPUT.NAME, "metadata.rds", sep = "_")
-RDS.NORMALIZED.OUTPUT <- paste("BMI", OUTPUT.NAME, "HK-normalized-counts.rds", sep = "_")
+RDS.METADATA.OUTPUT <- paste(OUTPUT.NAME, "BMI", "metadata.rds", sep = "_")
+RDS.NORMALIZED.OUTPUT <- paste(OUTPUT.NAME, "BMI", "HK-normalized-counts.rds", sep = "_")
 saveRDS(metadata, RDS.METADATA.OUTPUT) 
 saveRDS(ncounts, RDS.NORMALIZED.OUTPUT)
 
@@ -174,6 +181,7 @@ plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
 #counts <- counts.old
 #metadata <- metadata.old
 #eset <- eset.old
+
 ### ------------------------
 ### Differential expression analysis
 ### ------------------------
@@ -231,7 +239,6 @@ ENRICHMENT.UNDER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-UNDER.csv", sep = "_")
 enrich.rs <- enrich.cp(res, LABEL.OF.INTEREST, type="all", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.summary <- enrich.rs$summary %>% arrange(p.adjust)
 enrich.rs.summary <- convert.enriched.ids(enrich.rs.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
-write_csv(x = enrich.rs.summary, path = ENRICHMENT.ALL.OUTPUT)
 
 ### -- # Faster to get over and under from the all??? # -- ###
 
@@ -239,12 +246,15 @@ write_csv(x = enrich.rs.summary, path = ENRICHMENT.ALL.OUTPUT)
 enrich.rs.over <- enrich.cp(res, LABEL.OF.INTEREST, type="over", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.over.summary <- enrich.rs.over$summary %>% arrange(p.adjust)
 enrich.rs.over.summary <- convert.enriched.ids(enrich.rs.over.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
-write_csv(x = enrich.rs.over.summary, path = ENRICHMENT.OVER.OUTPUT)
 
 # Enrich - Under
 enrich.rs.under <- enrich.cp(res, LABEL.OF.INTEREST, type="under", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.under.summary <- enrich.rs.under$summary %>% arrange(p.adjust)
 enrich.rs.under.summary <- convert.enriched.ids(enrich.rs.under.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
+
+
+write_csv(x = enrich.rs.summary, path = ENRICHMENT.ALL.OUTPUT)
+write_csv(x = enrich.rs.over.summary, path = ENRICHMENT.OVER.OUTPUT)
 write_csv(x = enrich.rs.under.summary, path = ENRICHMENT.UNDER.OUTPUT)
 
 # Show an enrichment summary
@@ -270,15 +280,19 @@ dotplot(enrich.rs.under$kg, x="count", showCategory=10, colorBy="qvalue", title 
 # <!-- GO BP Enrichment in under-expressed genes: -->
 #dotplot(enrich.rs.under$bp, x="count", showCategory=10, colorBy="qvalue")
 
-# View KEGG Path
+# Filter by qvalue and by ontology (kegg for pathview)
 enrich.kegg.all.summary.filtered <- ontology.enrichment.qval.filter(enrichment.summary = enrich.rs.summary,
                                                                     ontology = "kg",
                                                                     qval = Q.VALUE.THRESHOLD)
-#
+
+# The next plot should be something user could play with to decide how many does he want
 plot(x = enrich.kegg.all.summary.filtered$qvalue)
 enrich.kegg.all.summary.filtered
 
-#viewkeggpath(path="hsa04151", enrichment = enrich.rs.summary, dea.p = dea.p)
+# View KEGG Path
+#viewkeggpath(path="hsa04151", enrichment = enrich.rs.summary, dea.p = dea.p) #, output = "images/")
+#KEGGPATH.SUFFIX <- ".pathview.png"
+#my.file.rename(from = paste("hsa04151",KEGGPATH.SUFFIX,sep = ""), to = paste("images/", "hsa04151",KEGGPATH.SUFFIX,sep = ""))
 for(pathid in enrich.kegg.all.summary.filtered$ID){
   viewkeggpath(path=pathid, enrichment = enrich.rs.summary, dea.p = dea.p)
 }
@@ -287,3 +301,17 @@ for(pathid in enrich.kegg.all.summary.filtered$ID){
 ### pathfindR | https://cran.r-project.org/web/packages/pathfindR/index.html
 ### ------------------------
 
+
+### R Markdown Report --- TO BE FIXED
+
+#Sys.setenv(RSTUDIO_PANDOC="/usr/lib/rstudio/bin/pandoc")
+MARKDOWN.PATH <- "reports/DEA_report.Rmd"
+MARKDOWN.OUTPUT <- "../docs/DEA_report.html"
+markdown.params <- list(
+  title = paste("DEAKit Report - Effect of", LABEL.OF.INTEREST, "in gene expression", sep = " "),
+  author = "PERSON USING THE TOOLKIT",
+  date = Sys.Date()
+)
+rmarkdown::render("reports/DEA_report.Rmd", output_file = MARKDOWN.OUTPUT)
+#rmarkdown::render("reports/DEA_report.Rmd", params = params.pdf, output_file = output.pdf)
+#knitr::knit(MARKDOWN.PATH, output= "output.pdf")

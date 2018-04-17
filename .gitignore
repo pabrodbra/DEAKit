@@ -1,7 +1,12 @@
 # Created by https://www.gitignore.io/api/pycharm,webstorm,python,sublimetext,windows,xcode
 
 ### Files
-data/
+data/*
+output/*
+images/*
+docs/*
+!*.keep
+
 vscode/
 .Rproj.user/
 results/
