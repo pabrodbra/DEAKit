@@ -5,7 +5,7 @@ orgdb = "org.Hs.eg.db"
 biomart_dataset = "hsapiens_gene_ensembl"
 keggname = "hsa"
 
-packages <- c("dplyr", "readr", "matrixStats", "tidyr","ggplot2", "cowplot", "rgl", "calibrate", "rmarkdown")
+packages <- c("dplyr", "readr", "matrixStats", "tidyr","ggplot2", "cowplot", "rgl", "calibrate", "rmarkdown", "pathfindR")
 diff.packages <- setdiff(packages, rownames(installed.packages()))
 if (length(diff.packages) > 0) {
   install.packages(diff.packages, dependencies = TRUE)  
@@ -310,10 +310,10 @@ plot.Volcano <- function(tab, tab2, lfc.threshold, pval.threshold, plot.title = 
 ### coreDEA_4.R | Pathway Analysis
 ### ------------------------
 
-summarize.cp = function(res, comparison) {
+summarize.cp <- function(res, comparison) {
   summaries = data.frame()
   for (ont in names(res)) {
-    ontsum = summary(res[[ont]])
+    ontsum = summary(res[[ont]]) # as.data.frame() instead of summary??
     ontsum$ont = ont
     summaries = rbind(summaries, ontsum)
   }
@@ -321,7 +321,7 @@ summarize.cp = function(res, comparison) {
   return(summaries)
 }
 
-enrich.cp = function(res, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
+enrich.cp <- function(res, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
   res = res %>% data.frame()  %>% left_join(entrez, by = "refseq_mrna") %>% filter(!is.na(entrezgene))
   universe = res$entrezgene 
   if(type=="all"){
@@ -386,7 +386,7 @@ enrich.cp = function(res, comparison, type="over", pval.threshold = 0.05, lfc.th
   }
 }
 
-convert.enriched.ids = function(res, entrezsymbol) {
+convert.enriched.ids <- function(res, entrezsymbol) {
   res = res %>% mutate(geneID = strsplit(as.character(geneID), "/")) %>% 
     tidyr::unnest(geneID) %>% 
     left_join(entrezsymbol, by = c(geneID = "entrezgene")) %>% 

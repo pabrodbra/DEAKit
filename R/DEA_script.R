@@ -3,7 +3,7 @@
 ### Author: Pablo Rodríguez Brazzarola
 ### ------------------------
 
-rm(list = ls())
+#rm(list = ls())
 dev.off()
 
 ### Load DEA_functions.R
@@ -235,12 +235,11 @@ ENRICHMENT.ALL.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-ALL.csv", sep = "_")
 ENRICHMENT.OVER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-OVER.csv", sep = "_")
 ENRICHMENT.UNDER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-UNDER.csv", sep = "_")
 
+# Can restructure code in 'enrich.cp' ??
 # Enrich - All
 enrich.rs <- enrich.cp(res, LABEL.OF.INTEREST, type="all", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
 enrich.rs.summary <- enrich.rs$summary %>% arrange(p.adjust)
 enrich.rs.summary <- convert.enriched.ids(enrich.rs.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
-
-### -- # Faster to get over and under from the all??? # -- ###
 
 # Enrich - Over
 enrich.rs.over <- enrich.cp(res, LABEL.OF.INTEREST, type="over", pval.threshold = P.VALUE.THRESHOLD, lfc.threshold = LOG.FC.THRESHOLD)
@@ -300,6 +299,8 @@ for(pathid in enrich.kegg.all.summary.filtered$ID){
 ### ------------------------
 ### pathfindR | https://cran.r-project.org/web/packages/pathfindR/index.html
 ### ------------------------
+
+
 
 
 ### ------------------------
