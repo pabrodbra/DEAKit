@@ -12,7 +12,8 @@ source("R/DEA_functions.R")
 args <- commandArgs(trailingOnly = TRUE)
 
 #if (length(args)>=10 && length(args)<=12) {
-#  stop("***USAGE*** Rscript RACC_script.R <RACC_results_directory> <RACC_report_directory> <Absolute_RACKit_src_r>\n", call.=FALSE)
+#  stop("***USAGE*** Rscript DEA_script.R <RCC Directory> <RLF Name> <Key of Interest> <Label of Interest> <Values of Key to Compare>
+#       <ETC...>\n", call.=FALSE)
 #}
 
 # 1 - RCC Data directory
