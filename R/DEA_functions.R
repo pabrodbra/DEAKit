@@ -147,13 +147,13 @@ get.RCC.set.and.counts <- function(sampletype, rcc.directory, rlf.filename){
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
 ### Field of View plots
-plotFOV = function(eset, metadata, fov_threshold, comparison.key, legend.label) {
+plotFOV = function(eset, metadata, fov.threshold, comparison.key, legend.label) {
   pdat = pData(eset) %>%
     tibble::rownames_to_column() %>%
     left_join(metadata, by=c("rowname"="Sample.name"))
   pdat$pcounted = pdat$FovCounted/pdat$FovCount * 100
   
-  ggplot(pdat, aes(rowname, pcounted, color=pdat[[comparison.key]])) + 
+  p <- ggplot(pdat, aes(rowname, pcounted, color=pdat[[comparison.key]])) + 
     geom_point() +
     theme(axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
@@ -161,9 +161,10 @@ plotFOV = function(eset, metadata, fov_threshold, comparison.key, legend.label) 
     scale_y_continuous(expand = c(0,0)) +
     expand_limits(y = c(0,1.05 * max(pdat$pcounted))) +
     ylab("percentage of FOV counted") + xlab("Sample.name") +
-    geom_hline(yintercept=fov_threshold, color="red") +
+    geom_hline(yintercept=fov.threshold, color="red") +
     labs(color=legend.label) +
     scale_colour_brewer(palette="Set1")
+  return(p)
 }
 
 ### Binding Density plot
@@ -171,7 +172,7 @@ plotBD <- function(eset, metadata, comparison.key, legend.label, y.thresholds = 
   pdat = pData(eset) %>%
     tibble::rownames_to_column() %>%
     left_join(metadata, by=c("rowname"="Sample.name"))
-  ggplot(pdat, aes(rowname, BindingDensity, color=pdat[[comparison.key]])) + 
+  p <- ggplot(pdat, aes(rowname, BindingDensity, color=pdat[[comparison.key]])) + 
     geom_point() +
     theme(axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
@@ -183,6 +184,7 @@ plotBD <- function(eset, metadata, comparison.key, legend.label, y.thresholds = 
     geom_hline(yintercept=y.thresholds[2], color="red") +
     labs(color=legend.label) +
     scale_colour_brewer(palette="Set1")
+  return(p)
 }
 
 ### Extract predicates

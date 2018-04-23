@@ -80,12 +80,14 @@ counts <- rcc.set.and.count.matrix$count.matrix
 ### ------------------------
 
 # Field of View (FOV) Plots
-plotFOV(eset = eset, metadata = metadata, fov_threshold = FOV.THRESHOLD,
+fov.plot <- plotFOV(eset = eset, metadata = metadata, fov.threshold = FOV.THRESHOLD,
         comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
+fov.plot
 
 # Binding Density (BD) Plots
-plotBD(eset = eset, metadata = metadata,
+bd.plot <- plotBD(eset = eset, metadata = metadata, y.thresholds = BD.THRESHOLDS,
        comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
+bd.plot
 
 # Positive Controls
 boxplot.expr(eset,is.positive)

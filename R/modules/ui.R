@@ -9,23 +9,30 @@ for(m in modules.tabs){
 
 # Define UI for application that draws a histogram
 app.ui <- shinyUI(fluidPage(
-  
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
-    ),
+  fluidPage(title = "DEAKit - Application",
+            theme = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
+            tags$script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"),
+            tags$script("$(document).ready(function() { $(\"body\").tooltip({ selector: '[data-toggle=tooltip]' });});"),
+            useShinyjs(),
     
-    # Show a plot of the generated distribution
-    mainPanel(
-       plotOutput("distPlot")
-    )
+            # Page
+            navbarPage(
+              div(
+                img(
+                  src = "https://vignette.wikia.nocookie.net/fantendo/images/5/5c/Corruption_and_Energy.png/revision/latest?cb=20151117140508",#"R/www/logo.png",
+                  height = 30,
+                  width = "auto"
+                  )
+                ),
+              
+              load.data.panel,
+              quality.control.panel,
+              #de.analysis.panel,
+              #pathway.visualization.panel
+              #),
+            
+              includeScript("R/www/js/mainFunctions.js")
+            )
   )
-))
+  )
+)

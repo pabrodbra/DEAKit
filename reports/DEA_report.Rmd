@@ -51,7 +51,7 @@ We monitor some QC aspects and normalise the data according to several criteria.
 ```{r echo=T,message=F, warning=F}
 
 # Field of View (FOV) Plots
-plotFOV(eset = eset, metadata = metadata, fov_threshold = FOV.THRESHOLD,
+plotFOV(eset = eset, metadata = metadata, fov.threshold = FOV.THRESHOLD,
         comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
 
 ```
@@ -62,7 +62,7 @@ Due to the nature of the nCounter technology, analysis of some samples may produ
 
 ```{r echo=T,message=FALSE, warning=FALSE}
 # Binding Density (BD) Plots
-plotBD(eset = eset, metadata = metadata,
+plotBD(eset = eset, metadata = metadata, y.thresholds = bd.threshold,
        comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
 ```
 
