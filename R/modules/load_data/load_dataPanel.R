@@ -46,7 +46,7 @@ load.data.panel <-
              ),
              column(12,
                     span("Load Data results:"),
-                    wellPanel(
+                    wellPanel(id = "ld.res",
                       span("Metadata:"),
                       dataTableOutput("loaded.metadata"),
                       span("Count matrix (first 5 columns) :"),

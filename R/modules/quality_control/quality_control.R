@@ -38,6 +38,8 @@ quality.control.core <- function(){
   quality.control.values$endogenous.housekeeping.condition.boxplot <- boxplot.multiple.conditions(load.data.values$counts, conditions = c("Endogenous", "Housekeeping"), 
                                                                            title.label = "Housekeeping + Endogenous Genes Expression per Sample")
   quality.control.values$endogenous.housekeeping.condition.boxplot <- quality.control.values$endogenous.housekeeping.condition.boxplot+geom_hline(yintercept = (quality.control.values$lod),colour="red")
+  
+  #showElement("qc.res")
 }
 
 observeEvent(input$qualityControlButton, quality.control.core())
@@ -49,3 +51,5 @@ output$qc.negative.control.bp <- renderPlot(plot(quality.control.values$negative
 output$qc.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.boxplot))
 output$qc.sample.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.condition.boxplot))
 output$qc.sample.endogenous.housekeeping.bp <- renderPlot(plot(quality.control.values$endogenous.housekeeping.condition.boxplot))
+
+#hideElement("qc.res")

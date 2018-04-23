@@ -24,9 +24,9 @@ quality.control.panel <- tabPanel(title = "Quality Control",
                                              div(class="text-center", actionButton("qualityControlButton", "Generate plots", class="btn-primary"))
                                            )
                                     ),
-                                    column(12,
+                                    column(12, 
                                            span("Quality Control results:"),
-                                           wellPanel(
+                                           wellPanel(id = "qc.res",
                                              span("Field of View:"),
                                              plotOutput("qc.fov"),
                                              
