@@ -7,7 +7,7 @@
 dev.off()
 
 ### Load DEA_functions.R
-source("R/DEA_functions.R")
+source("R/DçEA_functions.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -23,11 +23,12 @@ args <- commandArgs(trailingOnly = TRUE)
 # 5 - VALUES OF SUCH KEY TO COMPARE - For all 
 # 6 - FIELD OF VIEW THRESHOLD - For FOV plot
 # 7 - BINDING DENSITY THRESHOLDS (min and max) - For BD plot
-# 8 - P VALUE THRESHOLD - For DEA & Pathway Enrichment
-# 9 - LOG FC THRESHOLD - For DEA & Pathway Enrichment
-# 10 - Q VALUE THRESHOLD - For Pathway Enrichment
-# 11 - SEED - Optional
-# 12 - OUTPUT - Optional
+# 8 - P VALUE THRESHOLD - For DEA
+# 9 - LOG FC THRESHOLD - For DEA
+# 10 - P VALUE THRESHOLD - For Pathway Enrichment (Both)
+# 11 - Q VALUE THRESHOLD - For Pathway Enrichment
+# 12 - SEED - Optional
+# 13 - OUTPUT - Optional
 
 ### TODO ###
 # - Make report in RMarkdown to /reports
@@ -211,6 +212,9 @@ tab2 = data.frame(logFC = dea.o$log2FoldChange, negLogPval = -log10(dea.o$padj),
 
 plot.Volcano(tab, tab2, LOG.FC.THRESHOLD, P.VALUE.THRESHOLD, plot.title = "Volcano Plot")
 
+volcano.p <- plot.Volcano2(tab2, LOG.FC.THRESHOLD, P.VALUE.THRESHOLD, plot.title = "Volcano Plot")
+volcano.p
+
 ### ------------------------
 ### Pathway analysis
 ### ------------------------
@@ -285,7 +289,7 @@ dotplot(enrich.rs.under$kg, x="count", showCategory=10, colorBy="qvalue", title 
 # Filter by qvalue and by ontology (kegg for pathview)
 enrich.kegg.all.summary.filtered <- ontology.enrichment.qval.filter(enrichment.summary = enrich.rs.summary,
                                                                     ontology = "kg",
-                                                                    qval = Q.VALUE.THRESHOLD)
+                                                                    qval = Q)
 
 # The next plot should be something user could play with to decide how many does he want
 plot(x = enrich.kegg.all.summary.filtered$qvalue)

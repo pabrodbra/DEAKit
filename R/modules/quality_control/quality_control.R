@@ -40,16 +40,17 @@ quality.control.core <- function(){
   quality.control.values$endogenous.housekeeping.condition.boxplot <- quality.control.values$endogenous.housekeeping.condition.boxplot+geom_hline(yintercept = (quality.control.values$lod),colour="red")
   
   #showElement("qc.res")
+  # OUTPUT
+  output$qc.fov <- renderPlot(plot(quality.control.values$fov))
+  output$qc.bd <- renderPlot(plot(quality.control.values$bd))
+  output$qc.positive.control.bp <- renderPlot(plot(quality.control.values$positive.control))
+  output$qc.negative.control.bp <- renderPlot(plot(quality.control.values$negative.control))
+  output$qc.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.boxplot))
+  output$qc.sample.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.condition.boxplot))
+  output$qc.sample.endogenous.housekeeping.bp <- renderPlot(plot(quality.control.values$endogenous.housekeeping.condition.boxplot))
+  
 }
 
 observeEvent(input$qualityControlButton, quality.control.core())
-
-output$qc.fov <- renderPlot(plot(quality.control.values$fov))
-output$qc.bd <- renderPlot(plot(quality.control.values$bd))
-output$qc.positive.control.bp <- renderPlot(plot(quality.control.values$positive.control))
-output$qc.negative.control.bp <- renderPlot(plot(quality.control.values$negative.control))
-output$qc.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.boxplot))
-output$qc.sample.housekeeping.bp <- renderPlot(plot(quality.control.values$housekeeping.condition.boxplot))
-output$qc.sample.endogenous.housekeeping.bp <- renderPlot(plot(quality.control.values$endogenous.housekeeping.condition.boxplot))
 
 #hideElement("qc.res")

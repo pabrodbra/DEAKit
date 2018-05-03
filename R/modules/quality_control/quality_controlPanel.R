@@ -28,25 +28,25 @@ quality.control.panel <- tabPanel(title = "Quality Control",
                                            span("Quality Control results:"),
                                            wellPanel(id = "qc.res",
                                              span("Field of View:"),
-                                             plotOutput("qc.fov"),
+                                             plotOutput("qc.fov",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Binding Density:"),
-                                             plotOutput("qc.bd"),
+                                             plotOutput("qc.bd",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Positive Controls Boxplot:"),
-                                             plotOutput("qc.positive.control.bp"),
+                                             plotOutput("qc.positive.control.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Negative Controls Boxplot:"),
-                                             plotOutput("qc.negative.control.bp"),
+                                             plotOutput("qc.negative.control.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Housekeeping Genes Boxplot:"),
-                                             plotOutput("qc.housekeeping.bp"),
+                                             plotOutput("qc.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Housekeeping Genes per Sample Boxplot:"),
-                                             plotOutput("qc.sample.housekeeping.bp"),
+                                             plotOutput("qc.sample.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
                                              
                                              span("Endogenous and Housekeeping Genes per Sample Boxplot:"),
-                                             plotOutput("qc.sample.endogenous.housekeeping.bp")
+                                             plotOutput("qc.sample.endogenous.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE)
                                            )
                                     )
                                   )

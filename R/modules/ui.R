@@ -27,7 +27,8 @@ app.ui <- shinyUI(fluidPage(
               
               load.data.panel,
               quality.control.panel,
-              #de.analysis.panel,
+              normalization.panel,
+              dea.panel,
               #pathway.visualization.panel
               #),
             

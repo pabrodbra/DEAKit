@@ -1,4 +1,5 @@
 load.data.values <- reactiveValues()
+global.values <- reactiveValues()
 
 load.data.core <- eventReactive(input$loadDataButton, {
   rcc.path <- input$rcc.path
@@ -12,12 +13,12 @@ load.data.core <- eventReactive(input$loadDataButton, {
   load.data.values$keys.vector <- unlist(lapply(seq_len(input$key.of.interest), function(x) paste("key",x,sep = "")), use.names = FALSE)
   load.data.values$values.of.key.of.interest <- c(key.value.1, key.value.2)
   
-  # Load data + Extract metadata
-  #output$metadata <- extract.rcc.metadata(rcc.path, keys.vector, values.of.key.of.interest)
+  global.values$key.label <- label.of.key
+  
+  # Load data + Extract metadata - CHANGE FOR INPUT
   load.data.values$metadata <- extract.rcc.metadata(rcc.directory, keys.vector, VALUES.OF.KEY.OF.INTEREST)
   
-  # Retrieve Set and Count matrix
-  #rcc.set.and.count.matrix <- get.RCC.set.and.counts(load.data.values$metadata, rcc.path, rlf.path)
+  # Retrieve Set and Count matrix - CHANGE FOR INPUT
   load.data.values$rcc.set.and.count.matrix <- get.RCC.set.and.counts(metadata, rcc.directory, rlf.filename)
   
   load.data.values$eset <- rcc.set.and.count.matrix$set

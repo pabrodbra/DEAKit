@@ -295,7 +295,7 @@ getDE.raw <- function(ncounts, metadata, design){ ## Gets the same DE data, less
 
 plot.Volcano <- function(tab, tab2, lfc.threshold, pval.threshold, plot.title = ""){
   par(mar = c(5, 4, 4, 4))
-  plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]~fold~change), ylab = expression(-log[10]~pvalue))
+  p <- plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]~fold~change), ylab = expression(-log[10]~pvalue))
   title(main = plot.title)
   # signGenes <- (abs(tab$logFC) > lfc & tab$negLogPval > -log10(pval))
   points(tab[(abs(tab$logFC) > lfc.threshold), ], pch = 16, cex = 0.8, col = "orange") 
@@ -306,6 +306,33 @@ plot.Volcano <- function(tab, tab2, lfc.threshold, pval.threshold, plot.title = 
   mtext(paste("pval =", pval.threshold), side = 4, at = -log10(pval.threshold), cex = 0.8, line = 0.5, las = 1) 
   mtext(c(paste("-", lfc.threshold, "fold"), paste("+", lfc.threshold, "fold")), side = 3, at = c(-lfc.threshold, lfc.threshold), cex = 0.8, line = 0.5)
   with(subset(tab2, negLogPval > -log10(pval.threshold) & abs(logFC)>1), textxy(logFC, negLogPval, labs=Gene, cex=.4))
+  
+  return(p)
+}
+
+plot.Volcano2 <- function(tab, lfc.threshold, pval.threshold, plot.title = ""){
+  max.abs.log.fc <- max(abs(tab$logFC))
+  max.p.value <- max(abs(tab$negLogPval))
+  neg.log.p.value <- -log10(pval.threshold)
+  subset.tab <- tab[(abs(tab$logFC) > lfc.threshold & tab$negLogPval > -log10(pval.threshold)), ]
+  p <- ggplot(data=tab, aes(x=logFC, y=negLogPval))+
+    theme(legend.position = "none") +
+    ggtitle(plot.title)+
+    geom_point(alpha=0.6, size=1.75, color="black")+
+    geom_point(data = tab[(tab$negLogPval > -log10(pval.threshold)), ], alpha=0.6, size=1.75, color="green")+
+    geom_point(data = subset.tab,
+               alpha=0.6, size=1.75, color="red")+
+    xlim(c(-max.abs.log.fc,max.abs.log.fc)) + ylim(c(0, max.p.value+1)) +
+    xlab(expression(log[2]~fold~change)) + ylab(expression(-log[10]~pvalue)) +
+    geom_vline(xintercept=c(-lfc.threshold,lfc.threshold), linetype="dotted", color = "blue", size=0.8) +
+    geom_hline(yintercept=c(-neg.log.p.value,neg.log.p.value), linetype="dotted", color = "green3", size=0.8) +
+    annotate("text", label= paste("pval =", pval.threshold), x=max.abs.log.fc-0.25, y=neg.log.p.value+0.5, size=4) +
+    annotate("text", label= c(paste("-", lfc.threshold, "fold"), paste("+", lfc.threshold, "fold")), 
+             x=c(-lfc.threshold-0.5,lfc.threshold+0.5), y=max.p.value-0.25, size=4) +
+    annotate("text", label=subset.tab$Gene,
+             x = subset.tab$logFC,
+             y = subset.tab$negLogPval+0.6, size = 3)
+  return(p)
 }
 
 ### ------------------------
