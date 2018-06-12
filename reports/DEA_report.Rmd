@@ -23,7 +23,7 @@ output: html_document
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = F)
 ```
 
 ### Introduction
@@ -51,8 +51,8 @@ We monitor some QC aspects and normalise the data according to several criteria.
 ```{r echo=T,message=F, warning=F}
 
 # Field of View (FOV) Plots
-plotFOV(eset = eset, metadata = metadata, fov.threshold = FOV.THRESHOLD,
-        comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
+plotFOV(eset = eset, metadata = metadata, fov.threshold = opt$fov,
+        comparison.key = key.label, legend.label = opt$label)
 
 ```
 
@@ -62,8 +62,8 @@ Due to the nature of the nCounter technology, analysis of some samples may produ
 
 ```{r echo=T,message=FALSE, warning=FALSE}
 # Binding Density (BD) Plots
-plotBD(eset = eset, metadata = metadata, y.thresholds = bd.threshold,
-       comparison.key = key.label, legend.label = LABEL.OF.INTEREST)
+plotBD(eset = eset, metadata = metadata, y.thresholds = c(opt$bd_min, opt$bd_max),
+       comparison.key = key.label, legend.label = opt$label)
 ```
 
 
@@ -89,7 +89,7 @@ boxplot.expr(eset,is.negative)
 
 We establish a noise threshold. This threshold is based on the mean and standard deviation of counts of the negative control genes and represents the background noise. We define it as the mean expression of the negative genes counts + 2 times the standard deviation.
 
-```{r, echo=T,comment=F, warning=F}
+```{r echo=T,comment=F, warning=F}
 # Noise Threshold
 lodcounts <- extract.pred(eset, is.negative)
 lod <- mean(lodcounts$count) + 2 * sd(lodcounts$count)
@@ -101,7 +101,7 @@ Expression of each housekeeping genes in all samples. The line in red represents
 
 We can observe that all the housekeeping genes have enough expression (above the noise threshold).
 
-```{r, echo=T}
+```{r, echo=T, message=F}
 # Housekeeping Genes
 housekeeping.boxplot<-boxplot.expr(eset,is.housekeeping)
 housekeeping.boxplot+geom_hline(yintercept = (lod),colour="red")
@@ -175,7 +175,7 @@ Plotting the samples in this transformed system show which samples are more simi
 
 ```{r, echo=T, message=FALSE, warning=FALSE}
 plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
-        , legend.label =  LABEL.OF.INTEREST, plot.title = PCA.PLOT.TITLE)
+        , legend.label =  opt$label, plot.title = PCA.PLOT.TITLE)
 
 ```
 
@@ -198,7 +198,7 @@ dplyr::select(dea.p, type, gene.name, id, baseMean, log2FoldChange, pvalue, padj
 We see the `r nrow(dea.p)` genes sorted by log2FC with significantly altered expression between samples of invasive tumours and samples with non-invasive tumours. We can show the results of the differential expression analysis as a volcano plot. A volcano plot typically plots some measure of effect on the x-axis (typically the fold change) and the statistical significance on the y-axis (typically the -log10 of the p-value). Genes that are highly dysregulated are farther to the left and right sides, while highly significant changes appear higher on the plot.
 
 ```{r message=FALSE, warning=FALSE}
-plot.Volcano(tab, tab2, LOG.FC.THRESHOLD, P.VALUE.THRESHOLD, plot.title = "Volcano Plot")
+plot.Volcano(tab, tab2, opt$log_fc, opt$dea_pvalue, plot.title = "Volcano Plot")
 ```
 
 
@@ -247,5 +247,6 @@ We can map the genes to a KEGG pathway with this function:
 # how do u want to view this?
 ```
 
-For example, this is how the pathway hsa04151 looks like:
+For example, this is how the pathway hsa04151 looks like: 
 ![imagename](../images/hsa04151.pathview.png)
+
