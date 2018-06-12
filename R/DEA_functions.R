@@ -4,11 +4,12 @@
 orgdb = "org.Hs.eg.db"
 biomart_dataset = "hsapiens_gene_ensembl"
 keggname = "hsa"
+cran.repo = "https://cran.rstudio.com"
 
 packages <- c("dplyr", "readr", "matrixStats", "tidyr","ggplot2", "cowplot", "rgl", "calibrate", "rmarkdown", "pathfindR")
 diff.packages <- setdiff(packages, rownames(installed.packages()))
 if (length(diff.packages) > 0) {
-  install.packages(diff.packages, dependencies = TRUE)  
+  install.packages(diff.packages, dependencies = TRUE, repos = cran.repo)  
 }
 
 source("http://bioconductor.org/biocLite.R")
@@ -119,12 +120,12 @@ extract.rcc.metadata <- function(rcc.directory, keys.vector, condition = c("0","
   return(metadata)
 }
 
-### Get the right RCC files into an RCCSet - RLF must be in RCC directory
+### Get the right RCC files into an RCCSet
 get.RCC.set.and.counts <- function(sampletype, rcc.directory, rlf.filename){
   rccSet <- newRccSet(
     rccFiles               = file.path(rcc.directory, sampletype$fname)
     #,rccCollectorToolExport = file.path(exampleDataDir, "nSolver", "RCC_collector_tool_export.csv")
-    ,rlf                    = file.path(rcc.directory, rlf.filename)
+    ,rlf                    = file.path(rlf.filename)
     #,cdrDesignData          = file.path(exampleDataDir, "CDR", "CDR-DesignData.csv")
     #,extraPdata             = file.path(exampleDataDir, "extraPdata", "SampleType.txt")
     #,blankLabel             = "blank"
@@ -306,8 +307,6 @@ plot.Volcano <- function(tab, tab2, lfc.threshold, pval.threshold, plot.title = 
   mtext(paste("pval =", pval.threshold), side = 4, at = -log10(pval.threshold), cex = 0.8, line = 0.5, las = 1) 
   mtext(c(paste("-", lfc.threshold, "fold"), paste("+", lfc.threshold, "fold")), side = 3, at = c(-lfc.threshold, lfc.threshold), cex = 0.8, line = 0.5)
   with(subset(tab2, negLogPval > -log10(pval.threshold) & abs(logFC)>1), textxy(logFC, negLogPval, labs=Gene, cex=.4))
-  
-  return(p)
 }
 
 plot.Volcano2 <- function(tab, lfc.threshold, pval.threshold, plot.title = ""){
@@ -352,67 +351,27 @@ summarize.cp <- function(res, comparison) {
 
 enrich.cp <- function(res, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
   res = res %>% data.frame()  %>% left_join(entrez, by = "refseq_mrna") %>% filter(!is.na(entrezgene))
-  universe = res$entrezgene 
-  if(type=="all"){
-    res <- res %>% filter(padj < pval.threshold)
-    genes = res$entrezgene
-    # Let the background genes be all the genes not just the genes in the gene expression panel
-    mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
-    # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # bp = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
-    # qvalueCutoff = 1, pAdjustMethod = "BH")
-    all = list(mf = mf, cc = cc, bp = bp, kg = kg)
-    all[["summary"]] = summarize.cp(all, comparison)
-    return(all)
-  }
-  if(type=="over"){
-    res.over <- res %>% filter(log2FoldChange > lfc.threshold & padj < pval.threshold)
-    genes = res.over$entrezgene
-    # Let the background genes be all the genes not just the genes in the gene expression panel
-    mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
-    # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # bp = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
-    # qvalueCutoff = 1, pAdjustMethod = "BH")
-    all = list(mf = mf, cc = cc, bp = bp, kg = kg)
-    all[["summary"]] = summarize.cp(all, comparison)
-    return(all)
-  }
-  
-  if(type=="under"){
-    res.under <- res %>% filter(log2FoldChange < -lfc.threshold & padj < pval.threshold)
-    genes = res.under$entrezgene
-    mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-    kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
-    # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # bp = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", 
-    # qvalueCutoff = 1, pvalueCutoff = 1)
-    # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
-    # qvalueCutoff = 1, pAdjustMethod = "BH")
-    all = list(mf = mf, cc = cc, bp = bp, kg = kg)
-    all[["summary"]] = summarize.cp(all, comparison)
-    return(all)
-  }
+  universe = res$entrezgene
+  res <- switch(type,
+                all = res %>% filter(padj < pval.threshold),
+                over = res %>% filter(log2FoldChange > lfc.threshold & padj < pval.threshold),
+                under = res %>% filter(log2FoldChange < -lfc.threshold & padj < pval.threshold))
+  genes = res$entrezgene
+  mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
+  # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
+  # qvalueCutoff = 1, pvalueCutoff = 1)
+  # cc = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", 
+  # qvalueCutoff = 1, pvalueCutoff = 1)
+  # bp = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", 
+  # qvalueCutoff = 1, pvalueCutoff = 1)
+  # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
+  # qvalueCutoff = 1, pAdjustMethod = "BH")
+  all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+  all[["summary"]] = summarize.cp(all, comparison)
+  return(all)
 }
 
 convert.enriched.ids <- function(res, entrezsymbol) {
