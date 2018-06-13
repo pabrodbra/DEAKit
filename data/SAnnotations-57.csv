@@ -1,0 +1,58 @@
+Sample name,Subtype,RNA.CONC,Tumor.Grade,Age.at.Excision,Ethnicity,BMI
+OR1002,Normal,152.98,Normal,58,Caucasian,23.30905307
+OR1003,Normal,130.97,Normal,59,Asian.Pacific Islander,23.23345618
+OR1004,Normal,97.44,Normal,57,Caucasian,20.28479857
+OR1006,Normal,129.83,Normal,62,Caucasian,23.61275089
+OR12682,B,162.74,Grade ll,49,Asian.Pacific Islander,20.06095444
+OR12686,D,152.98,Grade lll,60,Asian.Pacific Islander,21.92886277
+OR12707,D,129.83,Grade lll,41,Asian.Pacific Islander,24.30461788
+OR12853,A,84.35,Grade ll,51,Asian.Pacific Islander,23.01117686
+OR12854,C,165.91,Grade ll,46,Caucasian,27.28174603
+OR12856,D,163.18,Grade ll,33,Asian.Pacific Islander,19.06771066
+OR12861,B,145.23,Grade lll,54,Asian.Pacific Islander,20.3125
+OR12868,B,85,Grade ll,65,Asian.Pacific Islander,21.77843524
+OR12870,B,104,Grade ll,61,Caucasian,41.015625
+OR12876,B,148.2,Grade ll,49,Caucasian,24.1671624
+OR12878,B,107.27,Grade lll,55,Asian.Pacific Islander,19.97918835
+OR12882,B,123.98,Grade ll,46,Asian.Pacific Islander,22.37567995
+OR12884,A,114.54,Grade ll,58,Caucasian,25.390625
+OR12887,B,174.65,Grade lll,59,Asian.Pacific Islander,20.32443826
+OR12889,B,67.21,Grade ll,57,Caucasian,42.75728733
+OR12892,A,97.58,Grade ll,38,Caucasian,26.29848784
+OR12893,D,150.35,Grade lll,47,Asian.Pacific Islander,20.02884153
+OR12894,D,135.93,Grade lll,61,Caucasian,30.11621315
+OR12904,B,156.27,Grade lll,43,Asian.Pacific Islander,17.06555671
+OR12905,B,140.19,Grade ll,30,Caucasian,20.80856124
+OR12907,D,90.44,Grade lll,62,Caucasian,25.390625
+OR12908,C,151.51,Grade lll,71,Asian.Pacific Islander,20.34279778
+OR12914,A,103.14,Grade ll,74,Caucasian,31.34693878
+OR12923,B,94.65,Grade ll,53,Caucasian,43.94267171
+OR12925,C,240.29,Grade lll,51,Asian.Pacific Islander,19.22768787
+OR12926,D,131.73,Grade ll,70,Caucasian,31.25
+OR12961,C,235.19,Grade lll,60,Asian.Pacific Islander,19.72386588
+OR12962,B,115.62,Grade lll,38,Caucasian,23.1206236
+OR12969,C,190.25,Grade lll,37,Asian.Pacific Islander,23.30905307
+OR12976,B,118.04,Grade ll,62,Asian.Pacific Islander,23.23345618
+OR13004,D,171.1,Grade lll,55,Asian.Pacific Islander,20.28479857
+OR13005,C,183.23,Grade lll,53,Asian.Pacific Islander,23.61275089
+OR13022,A,131.15,Grade ll,44,Asian.Pacific Islander,24.76756592
+OR13054,D,125,Grade ll,55,Asian.Pacific Islander,23.30905307
+OR13076,A,60.38,Grade lll,52,Asian.Pacific Islander,25.390625
+OR13188,D,58.71,Grade ll,39,Caucasian,22.46003435
+OR13190,B,69.77,Grade ll,62,Asian.Pacific Islander,21.77843524
+OR13215,A,90.25,Grade ll,56,Caucasian,24.97704316
+OR13222,B,51.24,Grade ll,76,Caucasian,32.71861987
+OR13226,D,85.1,Grade lll,65,Caucasian,31.11111111
+OR13388,B,165.7,Grade lll,36,Asian.Pacific Islander,21.09619051
+OR13392,A,54.57,Grade l,NA,Caucasian,25.76571346
+OR13408,B,144.44,Grade l,67,Asian.Pacific Islander,22.265625
+OR13411,A,110.78,Grade lll,64,Asian.Pacific Islander,20.06095444
+OR13416,D,118.96,Grade lll,30,Asian.Pacific Islander,19.140625
+OR13425,A,58.12,Grade l,44,Asian.Pacific Islander,21.19274242
+OR13435,C,181.09,Grade ll,57,Asian.Pacific Islander,21.50188649
+OR13441,D,176.75,Grade lll,53,Asian.Pacific Islander,21.60410478
+OR13453,B,104.94,Grade ll,51,Asian.Pacific Islander,18.82711104
+OR13458,C,156.35,Grade ll,44,Asian.Pacific Islander,21.09375
+OR13462,C,106.8,Grade ll,48,Asian.Pacific Islander,19.22768787
+OR13465,A,70.62,Grade l,55,Asian.Pacific Islander,21.09375
+OR13550,C,229.88,Grade lll,36,Asian.Pacific Islander,23.23345618
