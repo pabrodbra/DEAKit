@@ -1,10 +1,10 @@
 # Created by https://www.gitignore.io/api/pycharm,webstorm,python,sublimetext,windows,xcode
 
 ### Files
-data/*
-output/*
-images/*
-docs/*
+#data/*
+#output/*
+#images/*
+#docs/*
 !*.keep
 
 vscode/
