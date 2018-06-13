@@ -6,12 +6,12 @@
 ### ------------------------
 
 
-### Load require packages and functions
-suppressWarnings(suppressPackageStartupMessages(require(optparse)))
-source("R/DEA_functions.R")
+### Load required optparse package for input arguments management
+if(!"optparse" %in% installed.packages()) 
+  install.packages("optparse", repos = "https://cran.rstudio.com")
+require(optparse)
 
-
-### Prepare input commands
+### Prepare input arguments
 option_list <- list(
   make_option(c("-c", "--rcc-directory"),  action="store", type="character", default=file.path("data", "PanCancer Pathways - 57"), 
               dest="rcc_dir", help="RCC data directory path"),
@@ -47,9 +47,12 @@ option_list <- list(
               dest="verbose", help="Activate verbose mode")
 )
 
-
 ### Parse command line options
 opt <- parse_args(OptionParser(option_list=option_list))
+
+
+### Load required packages and functions for executing the script
+source("R/DEA_functions.R")
 
 
 ### Arguments check
@@ -306,7 +309,7 @@ if(opt$verbose) {
 res<- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) 
 
 # Setup ENTREZ - Takes time
-mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL", dataset = biomart_dataset)
+mart <- biomaRt::useMart(biomart = "ensembl", dataset = biomart_dataset)
 entrez <- biomaRt::getBM(attributes = c("refseq_mrna", "entrezgene"), mart = mart)
 entrez$entrezgene <- as.character(entrez$entrezgene)
 entrezsymbol <- biomaRt::getBM(attributes = c("entrezgene", "hgnc_symbol"), mart = mart)
