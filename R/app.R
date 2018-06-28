@@ -11,7 +11,7 @@ library(shiny)
 library(shinyjs)
 library(DT)
 #('shiny', 'shinyjs', 'DT')
-source("R/DEA_functions.R")
+source('R/DEA_functions.R')
 
 # Load modules
 source('R/modules/modules.R', local = TRUE)
@@ -24,7 +24,8 @@ set.seed(SEED)
 base.output.path <- "output/"
 
 # Run app
-shinyApp(
+shinyApp( 
   ui = app.ui,
   server = app.server
 )
+

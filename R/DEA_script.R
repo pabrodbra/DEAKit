@@ -191,7 +191,7 @@ if(opt$verbose) {
 }
 
 
-# Pre-Normalization with Positive Controls
+# Pre-Normalization
 metadata$pos_nf = pos.factor(eset) #  normalization
 counts <- counts[!grepl("Positive", rownames(counts)),]
 counts <- counts[!grepl("Negative", rownames(counts)),]
@@ -202,7 +202,8 @@ pdf(file.path("output/", "Pre-Normalization.pdf"))
 plot(pre.normalization.boxplot + geom_hline(yintercept = lod,colour="red"))
 invisible(dev.off())
 
-# Normalization with Positive Controls
+
+# Normalize using positive controls
 ncounts <- counts %*% diag(metadata$pos_nf) 
 colnames(ncounts) <- colnames(counts)
 
@@ -213,7 +214,7 @@ plot(post.normalization.boxplot + geom_hline(yintercept = lod,colour="red"))
 invisible(dev.off())
 
 
-# Normalize housekeeping
+# Normalize using housekeeping
 metadata$hk_nf <- hk.factor(ncounts, lod)
 ncounts <- ncounts %*% diag(metadata$hk_nf)
 colnames(ncounts) <- colnames(counts)
@@ -253,8 +254,8 @@ PRINCIPAL.COMPONENT.Y <- 2
 PCA.PLOT.TITLE <- paste("PCA Plot | Component", PRINCIPAL.COMPONENT.X, "-", PRINCIPAL.COMPONENT.Y, sep = " ")
 
 pdf(file.path("output/", "Samples-PCA.pdf"))
-plot(plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
-             , legend.label =  opt$label, plot.title = PCA.PLOT.TITLE))
+plot(plotPCA(comps, pc, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label, 
+             legend.label =  opt$label, plot.title = PCA.PLOT.TITLE))
 invisible(dev.off())
 
 
@@ -306,7 +307,7 @@ if(opt$verbose) {
 
 
 # The core script for the pathway analysis expects a dataframe with the DEA named res
-res<- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) 
+res <- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) 
 
 # Setup ENTREZ - Takes time
 mart <- biomaRt::useMart(biomart = "ensembl", dataset = biomart_dataset)
@@ -328,17 +329,17 @@ ENRICHMENT.OVER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-OVER.csv", sep = "_")
 ENRICHMENT.UNDER.OUTPUT <- paste(OUTPUT.NAME, "Enrichment-UNDER.csv", sep = "_")
 
 # Enrich - All
-enrich.rs <- enrich.cp(res, opt$label, type="all", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
+enrich.rs <- enrich.cp(res, entrez, opt$label, type="all", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
 enrich.rs.summary <- enrich.rs$summary %>% arrange(p.adjust)
 enrich.rs.summary <- convert.enriched.ids(enrich.rs.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 
 # Enrich - Over
-enrich.rs.over <- enrich.cp(res, opt$label, type="over", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
+enrich.rs.over <- enrich.cp(res, entrez, opt$label, type="over", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
 enrich.rs.over.summary <- enrich.rs.over$summary %>% arrange(p.adjust)
 enrich.rs.over.summary <- convert.enriched.ids(enrich.rs.over.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 
 # Enrich - Under
-enrich.rs.under <- enrich.cp(res, opt$label, type="under", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
+enrich.rs.under <- enrich.cp(res, entrez, opt$label, type="under", pval.threshold = opt$path_pvalue, lfc.threshold = opt$log_fc)
 enrich.rs.under.summary <- enrich.rs.under$summary %>% arrange(p.adjust)
 enrich.rs.under.summary <- convert.enriched.ids(enrich.rs.under.summary,entrezsymbol = entrezsymbol) %>% arrange(p.adjust)
 
@@ -354,17 +355,17 @@ DOTPLOT.ENRICHMENT.UNDER.TITLE <- "Dotplot of Underexpressed Enriched Pathways a
 
 # KEGG enrichment in all significantly expressed genes:
 pdf(file.path("output/", "Dotplot-All.pdf"))
-plot(dotplot(enrich.rs$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.ALL.TITLE))
+plot(dotplot(enrich.rs$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.ALL.TITLE))
 invisible(dev.off())
 
 # KEGG enrichment in over-expressed genes:
 pdf(file.path("output/", "Dotplot-Over.pdf"))
-plot(dotplot(enrich.rs.over$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.OVER.TITLE))
+plot(dotplot(enrich.rs.over$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.OVER.TITLE))
 invisible(dev.off())
 
 # KEGG enrichment in under-expressed genes
 pdf(file.path("output/", "Dotplot-Under.pdf"))
-plot(dotplot(enrich.rs.under$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.UNDER.TITLE))
+plot(dotplot(enrich.rs.under$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.UNDER.TITLE))
 invisible(dev.off())
 
 
@@ -399,6 +400,8 @@ MARKDOWN.OUTPUT <- "../docs/DEA_report.html"
 markdown.params <- list(
   title = paste("DEAKit Report - Effect of", opt$label, "in gene expression", sep = " "),
   author = "PERSON USING THE TOOLKIT",
-  date = Sys.Date()
+  date = Sys.Date(),
+  sample_type = "breast cancer",
+  sample_associate = opt$label
 )
 rmarkdown::render("reports/DEA_report.Rmd", output_file = MARKDOWN.OUTPUT)

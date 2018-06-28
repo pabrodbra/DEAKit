@@ -69,7 +69,7 @@ geo.pos = function(eset) {
 }
 
 hk.pos = function(counts, lod) {
-  hk <- counts[grepl("Housekeeping", rownames(ncounts)),]
+  hk <- counts[grepl("Housekeeping", rownames(counts)),]
   # Normalize
   abovenoise = rowSums(hk > (lod)) >= (ncol(hk))
   hk.abovenoise = hk[abovenoise,]
@@ -121,11 +121,11 @@ extract.rcc.metadata <- function(rcc.directory, keys.vector, condition = c("0","
 }
 
 ### Get the right RCC files into an RCCSet
-get.RCC.set.and.counts <- function(sampletype, rcc.directory, rlf.filename){
+get.RCC.set.and.counts <- function(sampletype, rcc.directory, rlf.file){
   rccSet <- newRccSet(
     rccFiles               = file.path(rcc.directory, sampletype$fname)
     #,rccCollectorToolExport = file.path(exampleDataDir, "nSolver", "RCC_collector_tool_export.csv")
-    ,rlf                    = file.path(rlf.filename)
+    ,rlf                    = file.path(rlf.file)
     #,cdrDesignData          = file.path(exampleDataDir, "CDR", "CDR-DesignData.csv")
     #,extraPdata             = file.path(exampleDataDir, "extraPdata", "SampleType.txt")
     #,blankLabel             = "blank"
@@ -254,7 +254,7 @@ pca.loadings = function(object, ntop = 500) {
   return(pca)
 }
 
-plotPCA = function(comps, nc1, nc2, colorby, legend.label = "Key", plot.title = "") {
+plotPCA = function(comps, pc, nc1, nc2, colorby, legend.label = "Key", plot.title = "") {
   c1str = paste0("PC", nc1)
   c2str = paste0("PC", nc2)
   ggplot(comps, aes_string(c1str, c2str, color=colorby)) + geom_point() + theme_bw() + 
@@ -349,7 +349,7 @@ summarize.cp <- function(res, comparison) {
   return(summaries)
 }
 
-enrich.cp <- function(res, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
+enrich.cp <- function(res, entrez, comparison, type="over", pval.threshold = 0.05, lfc.threshold = 1) {
   res = res %>% data.frame()  %>% left_join(entrez, by = "refseq_mrna") %>% filter(!is.na(entrezgene))
   universe = res$entrezgene
   res <- switch(type,
@@ -357,9 +357,9 @@ enrich.cp <- function(res, comparison, type="over", pval.threshold = 0.05, lfc.t
                 over = res %>% filter(log2FoldChange > lfc.threshold & padj < pval.threshold),
                 under = res %>% filter(log2FoldChange < -lfc.threshold & padj < pval.threshold))
   genes = res$entrezgene
-  mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-  cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
-  bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  #mf = enrichGO(genes, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  #cc = enrichGO(genes, OrgDb = orgdb, ont = "CC", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
+  #bp = enrichGO(genes, OrgDb = orgdb, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 1, pvalueCutoff = 1)
   kg = enrichKEGG(gene = genes, organism = keggname, pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = "BH")
   # mf = enrichGO(genes, universe = universe, OrgDb = orgdb, ont = "MF", pAdjustMethod = "BH", 
   # qvalueCutoff = 1, pvalueCutoff = 1)
@@ -369,7 +369,7 @@ enrich.cp <- function(res, comparison, type="over", pval.threshold = 0.05, lfc.t
   # qvalueCutoff = 1, pvalueCutoff = 1)
   # kg = enrichKEGG(gene = genes, universe = universe, organism = keggname, pvalueCutoff = 1, 
   # qvalueCutoff = 1, pAdjustMethod = "BH")
-  all = list(mf = mf, cc = cc, bp = bp, kg = kg)
+  all = list(kg = kg)#, mf = mf, cc = cc, bp = bp)
   all[["summary"]] = summarize.cp(all, comparison)
   return(all)
 }
@@ -386,6 +386,10 @@ convert.enriched.ids <- function(res, entrezsymbol) {
 # Enrichment Summary Kegg filter
 ontology.enrichment.qval.filter <- function(enrichment.summary, ontology = "kg", qval = 0.05){
   return(enrichment.summary[(enrichment.summary$ont == ontology & enrichment.summary$qvalue < qval),])
+}
+
+ontology.enrichment.padjust.filter <- function(enrichment.summary, ontology = "kg", p.adj = 0.05){
+  return(enrichment.summary[(enrichment.summary$ont == ontology & enrichment.summary$p.adjust < p.adj),])
 }
 
 # View KEGG Path

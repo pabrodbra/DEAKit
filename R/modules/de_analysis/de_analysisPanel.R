@@ -5,12 +5,12 @@ dea.panel <- tabPanel(title = "DEA",
                      wellPanel(
                        div(class = "col-md-12",
                            #div(class = "col-md-6",
-                           textInput("dea.path", "DEA Enrichment output:",
+                           textInput("dea.path", "DEA Enrichment output:", value = file.path(getwd(), "output/PCR-0-1_DEA.csv"),
                                      placeholder = "/home/userXY/output/normalized-metadata.rds"),
                            helpText("Path of the output for the DEA enrichment data"),
                            
                            # RDS - Normalized count matrix output
-                           textInput("dea.sign.path", "DEA Significant Enrichment output:",
+                           textInput("dea.sign.path", "DEA Significant Enrichment output:", value = file.path(getwd(), "output/PCR-0-1_PVALUE-0.05_DEA.csv"),
                                      placeholder = "/home/userXY/output/normalized-count.rds"),
                            helpText("Path of the output for the DEA Significant Enrichment data")
                            ,
@@ -29,11 +29,11 @@ dea.panel <- tabPanel(title = "DEA",
                        div(class="text-center", actionButton("deaButton", "Execute Differential Expression Analysis", class="btn-primary"))
                      )
               ),
-              column(12, 
-                     span("Differential Expression Analysis results:"),
+              fillCol(width = "100%", height = "100%", # 12,
+                     span("Dotplot Expression Analysis results:"),
                      wellPanel(id = "dea.res",
                                span("Volcano Plot:"),
-                               plotOutput("volcano.plot",  width = PLOT.SIZE, height = PLOT.SIZE)
+                               plotOutput("volcano.plot")
                      )
               )
             )

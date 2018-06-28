@@ -29,7 +29,7 @@ app.ui <- shinyUI(fluidPage(
               quality.control.panel,
               normalization.panel,
               dea.panel,
-              #pathway.visualization.panel
+              pathview.panel,
               #),
             
               includeScript("R/www/js/mainFunctions.js")

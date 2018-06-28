@@ -6,7 +6,7 @@ PLOT.SIZE <- "600px"
 #     ./R/modules/<module_name>
 #       |-- <module_name>.R
 #       '-- <module_name>Panel.R.
-modules.tabs <- c("load_data", "quality_control", "normalization" , "de_analysis")#, "pathwview_viz", "pathfindR_viz")
+modules.tabs <- c("load_data", "quality_control", "normalization" , "de_analysis", "pathview_viz")#, "pathfindR_viz")
 
 # Modules to be disabled until search is perform.
 # This list consists of the values of the tab panels.

@@ -44,7 +44,7 @@ rlf.filename <- file.path(rcc.directory, "NS_CancerPath_C2535.rlf")
 base.output.path <- "output/"  # It needs to exist
 
 # CONSTANTS
-KEY.OF.INTEREST <- 1
+KEY.OF.INTEREST <- 2
 LABEL.OF.INTEREST <- "PCR"
 VALUES.OF.KEY.OF.INTEREST <- c("0","1")
 FOV.THRESHOLD <- 80 
@@ -144,6 +144,9 @@ post.normalization.boxplot + geom_hline(yintercept = lod,colour="red")
 # Normalize housekeeping
 metadata$hk_nf <- hk.factor(ncounts, lod) # Housekeeping normalization
 ncounts <- ncounts %*% diag(metadata$hk_nf) # Housekeeping normalization
+# ????? 
+# metadata$hk_nf <- hk.factor(counts, lod) # Housekeeping normalization
+#ncounts <- counts %*% diag(metadata$hk_nf)
 colnames(ncounts) <- colnames(counts)
 
 # Plot normalized housekeeping
@@ -177,8 +180,8 @@ PRINCIPAL.COMPONENT.Y <- 2
 
 PCA.PLOT.TITLE <- paste("PCA Plot | Component", PRINCIPAL.COMPONENT.X, "-", PRINCIPAL.COMPONENT.Y, sep = " ")
 
-plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
-        , legend.label =  LABEL.OF.INTEREST, plot.title = PCA.PLOT.TITLE)
+plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label, 
+        legend.label =  LABEL.OF.INTEREST, plot.title = PCA.PLOT.TITLE)
 
 # Histograma PCA sd???
 
@@ -220,10 +223,11 @@ volcano.p
 ### Pathway analysis
 ### ------------------------
 
-res<- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) # the core script for the pathway analysis expects a dataframe with the DEA named res
+res <- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) # the core script for the pathway analysis expects a dataframe with the DEA named res
 
 # Setup ENTREZ - Takes time
 mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL", dataset = biomart_dataset)
+# Takes so much f****** time
 entrez <- biomaRt::getBM(attributes = c("refseq_mrna", "entrezgene"), mart = mart)
 entrez$entrezgene <- as.character(entrez$entrezgene)
 entrezsymbol <- biomaRt::getBM(attributes = c("entrezgene", "hgnc_symbol"), mart = mart)
@@ -290,6 +294,26 @@ dotplot(enrich.rs.under$kg, x="count", showCategory=10, colorBy="qvalue", title 
 enrich.kegg.all.summary.filtered <- ontology.enrichment.qval.filter(enrichment.summary = enrich.rs.summary,
                                                                     ontology = "kg",
                                                                     qval = Q.VALUE.THRESHOLD)
+
+library(plotly)
+
+test.q.value.threshold <- 0.001
+test.q.value.threshold[2:11] <- seq(from = 0.005, to = 0.05, by = 0.005)
+
+n.adj.enrich.pathway <- sapply(test.q.value.threshold, function(x) 
+  nrow(ontology.enrichment.padjust.filter(enrichment.summary = enrich.rs.summary, ontology = "kg", 
+                                        p.adj = x)))
+
+n.qval.enrich.pathway <- sapply(test.q.value.threshold, function(x) 
+  nrow(ontology.enrichment.qval.filter(enrichment.summary = enrich.rs.summary, ontology = "kg", 
+                                          qval = x)))
+
+# Interactive BH adjusted p-value plot
+plot_ly(x = test.q.value.threshold, y = n.adj.enrich.pathway, type = 'scatter', 
+        name = "BH adjusted p-values", mode = 'lines+markers') %>%
+  add_trace(y = n.qval.enrich.pathway, name = "q-values", mode = 'lines+markers') %>%
+  layout(xaxis = list(title = "FDR threshold"),
+         yaxis = list(title = "Number of filtered enriched pathways"))
 
 # The next plot should be something user could play with to decide how many does he want
 plot(x = enrich.kegg.all.summary.filtered$qvalue)

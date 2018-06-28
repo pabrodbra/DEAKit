@@ -11,7 +11,8 @@ params:
   set_title: !r markdown.params$title
   set_author: !r markdown.params$author
   set_date: !r markdown.params$date
-  set_param: !r markdown.params$PARAM
+  set_sample_type: !r markdown.params$sample_type
+  set_sample_associate: !r markdown.params$sample_associate
 ---
 
 ---
@@ -28,7 +29,7 @@ knitr::opts_chunk$set(echo = TRUE, message = F)
 
 ### Introduction
 
-This experiment is a full differential expression analysis of PARAM.TYPE.OF.SAMPLE samples to find the changes in gene expression caused associated with PARAM.SAMPLE.ASSOCIATED.WITH. 
+This experiment is a full differential expression analysis of `r params$set_sample_type` samples to find the changes in gene expression associated with `r params$set_sample_associate`. 
 
 The analysis protocol is based on the sequential execution of the following steps:
 
@@ -174,7 +175,7 @@ Plotting the samples in this transformed system show which samples are more simi
 
 
 ```{r, echo=T, message=FALSE, warning=FALSE}
-plotPCA(comps, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
+plotPCA(comps, pc, PRINCIPAL.COMPONENT.X, PRINCIPAL.COMPONENT.Y, key.label
         , legend.label =  opt$label, plot.title = PCA.PLOT.TITLE)
 
 ```
@@ -235,11 +236,11 @@ Finally, we can see the KEGG pathways enriched.
 
 <!-- GO BP Enrichment in all the significantly expressed genes: -->
 ```{r,echo=TRUE}
-dotplot(enrich.rs$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.ALL.TITLE)
+dotplot(enrich.rs$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.ALL.TITLE)
 # KEGG enrichment in over-expressed genes:
-dotplot(enrich.rs.over$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.OVER.TITLE)
+dotplot(enrich.rs.over$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.OVER.TITLE)
 # KEGG enrichment in under-expressed genes
-dotplot(enrich.rs.under$kg, x="count", showCategory=10, colorBy="qvalue", title = DOTPLOT.ENRICHMENT.UNDER.TITLE)
+dotplot(enrich.rs.under$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.UNDER.TITLE)
 ```
 
 We can map the genes to a KEGG pathway with this function:

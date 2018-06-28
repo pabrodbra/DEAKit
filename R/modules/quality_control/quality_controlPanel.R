@@ -1,5 +1,5 @@
 quality.control.panel <- tabPanel(title = "Quality Control",
-                                  fluidRow(
+                                  fluidPage(
                                     column(12,
                                            span("Quality Control parameters:"),
                                            wellPanel(
@@ -24,29 +24,29 @@ quality.control.panel <- tabPanel(title = "Quality Control",
                                              div(class="text-center", actionButton("qualityControlButton", "Generate plots", class="btn-primary"))
                                            )
                                     ),
-                                    column(12, 
+                                    fillCol(width = "100%", height = "100%", #12,
                                            span("Quality Control results:"),
-                                           wellPanel(id = "qc.res",
+                                           wellPanel(id = "qc.res", #width = "100%", height = "100%",
                                              span("Field of View:"),
-                                             plotOutput("qc.fov",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.fov"),
                                              
                                              span("Binding Density:"),
-                                             plotOutput("qc.bd",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.bd"),
                                              
                                              span("Positive Controls Boxplot:"),
-                                             plotOutput("qc.positive.control.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.positive.control.bp"),
                                              
                                              span("Negative Controls Boxplot:"),
-                                             plotOutput("qc.negative.control.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.negative.control.bp"),
                                              
                                              span("Housekeeping Genes Boxplot:"),
-                                             plotOutput("qc.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.housekeeping.bp"),
                                              
                                              span("Housekeeping Genes per Sample Boxplot:"),
-                                             plotOutput("qc.sample.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE),
+                                             plotOutput("qc.sample.housekeeping.bp"),
                                              
                                              span("Endogenous and Housekeeping Genes per Sample Boxplot:"),
-                                             plotOutput("qc.sample.endogenous.housekeeping.bp",  width = PLOT.SIZE, height = PLOT.SIZE)
+                                             plotOutput("qc.sample.endogenous.housekeeping.bp")
                                            )
                                     )
                                   )

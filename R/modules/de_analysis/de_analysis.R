@@ -7,15 +7,14 @@ dea.core <- function(){
   shiny.DEA.SIGNIFICATIVE.OUTPUT.NAME <- input$dea.sign.path
   
   design <- as.formula(paste("~", key.label, sep = " "))
-  rownames(normalization.values$metadata) <- normalization.values$metadata$Sample.name
+  rownames(metadata) <- metadata$Sample.name
   
-  dea.values$dea.o <- getDE(ncounts = round(ncounts), metadata = normalization.values$metadata, design = design)
-  dea.values$dea.p <- dea.o %>% dplyr::filter(padj < dea.values$p.value) %>% arrange(-log2FoldChange)
+  dea.values$dea.o <- getDE(ncounts = round(ncounts), metadata = metadata, design = design)
+  dea.values$dea.p <- dea.values$dea.o %>% dplyr::filter(padj < dea.values$p.value) %>% arrange(-log2FoldChange)
   
   # Save DEA Results
-  
-  write_csv(dea.values$dea.o, DEA.OUTPUT.NAME)
-  write_csv(dea.values$dea.p, DEA.SIGNIFICATIVE.OUTPUT.NAME)
+  write_csv(dea.values$dea.o, shiny.DEA.OUTPUT.NAME)
+  write_csv(dea.values$dea.p, shiny.DEA.SIGNIFICATIVE.OUTPUT.NAME)
   
   # Show DEA Results
   #dplyr::select(dea.p, type, gene.name, id, baseMean, log2FoldChange, pvalue, padj)
@@ -24,6 +23,12 @@ dea.core <- function(){
   tab <- data.frame(logFC = dea.values$dea.o$log2FoldChange, negLogPval = -log10(dea.values$dea.o$padj), Gene=dea.values$dea.o$gene.name)
   
   dea.values$volcano.plot <- plot.Volcano2(tab, dea.values$log.fc, dea.values$p.value, plot.title = "Volcano Plot")
+  
+  # Store variables used in other scripts in Global Environment
+  assign("metadata", metadata, envir = globalenv())
+  assign("design", design, envir = globalenv())
+  assign("log.fc", dea.values$log.fc, envir = globalenv())
+  assign("dea.p", dea.values$dea.p, envir = globalenv())
   
   # OUTPUT
   output$volcano.plot <- renderPlot(plot(dea.values$volcano.plot))
