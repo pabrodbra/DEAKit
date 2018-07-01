@@ -243,11 +243,3 @@ dotplot(enrich.rs.over$kg, x="count", showCategory=10, color="qvalue", title = D
 dotplot(enrich.rs.under$kg, x="count", showCategory=10, color="qvalue", title = DOTPLOT.ENRICHMENT.UNDER.TITLE)
 ```
 
-We can map the genes to a KEGG pathway with this function:
-```{r message=FALSE, warning=FALSE, eval=FALSE}
-# how do u want to view this?
-```
-
-For example, this is how the pathway hsa04151 looks like: 
-![imagename](../images/hsa04151.pathview.png)
-
