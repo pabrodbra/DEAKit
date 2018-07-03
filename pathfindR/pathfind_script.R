@@ -25,6 +25,7 @@ setwd("../")
 
 ### Using our own data
 # Input data needs to be in the format produced by our own getDE.raw function
+# We need to generate this csv for the particular DEA analysis
 dea.raw <- read.csv("pathfindR/PCR_DEA_raw.csv", stringsAsFactors = FALSE)
 
 # Pre-process the data to be in the correct format 
