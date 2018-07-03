@@ -9,12 +9,12 @@ load.data.panel <-
                            
                        
                          # 1 - RCC Data directory
-                         textInput("rcc.path", "RCC Directory:", value = file.path(getwd(), "data/PanCancer Pathways - 57"),
+                         textInput("rcc.path", "RCC Directory:", value = file.path(getwd(), "data/PanCancer-Pathways-57"),
                                    placeholder = "/home/userXY/data/RCC_files/"),
                          helpText("Path of the Directory for the RCC files. Names must be identified as SAMPLE[_keyX][_keyX+1][...].RCC"),
                          
                          # 2 - RLF Filename
-                         textInput("rlf.path", "RLF File", value = file.path(getwd(), "data/PanCancer Pathways - 57/NS_CancerPath_C2535.rlf"),
+                         textInput("rlf.path", "RLF File:", value = file.path(getwd(), "data/PanCancer-Pathways-57/NS_CancerPath_C2535.rlf"),
                                    placeholder = "/home/userXY/data/RLF_file.rlf"),
                          helpText("Path of the Location of the RLF File"),
                          
@@ -41,7 +41,14 @@ load.data.panel <-
                          
                        ),
                        
-                       div(class="text-center", actionButton("loadDataButton", "Load Data", class="btn-primary"))
+                       div(class="text-center", 
+                           useShinyjs(),
+                           tags$style(appCSS),
+                           withBusyIndicatorUI(
+                             actionButton("loadDataButton", 
+                                          "Load Data", 
+                                          class="btn-primary"))
+                       )
                      )
              ),
              column(12,

@@ -5,14 +5,14 @@ dea.panel <- tabPanel(title = "DEA",
                      wellPanel(
                        div(class = "col-md-12",
                            #div(class = "col-md-6",
-                           textInput("dea.path", "DEA Enrichment output:", value = file.path(getwd(), "output/PCR-0-1_DEA.csv"),
+                           textInput("dea.path", "DEA output:", value = file.path(getwd(), base.output.path, "PCR-0-1_DEA.csv"),
                                      placeholder = "/home/userXY/output/normalized-metadata.rds"),
-                           helpText("Path of the output for the DEA enrichment data"),
+                           helpText("Path of the output for the DEA data"),
                            
                            # RDS - Normalized count matrix output
-                           textInput("dea.sign.path", "DEA Significant Enrichment output:", value = file.path(getwd(), "output/PCR-0-1_PVALUE-0.05_DEA.csv"),
+                           textInput("dea.sign.path", "DEA Significant output:", value = file.path(getwd(), base.output.path, "PCR-0-1_PVALUE-0.05_DEA.csv"),
                                      placeholder = "/home/userXY/output/normalized-count.rds"),
-                           helpText("Path of the output for the DEA Significant Enrichment data")
+                           helpText("Path of the output for the DEA Significant data")
                            ,
                            #),
                            
@@ -26,11 +26,18 @@ dea.panel <- tabPanel(title = "DEA",
                            
                        ),
                        
-                       div(class="text-center", actionButton("deaButton", "Execute Differential Expression Analysis", class="btn-primary"))
+                       div(class="text-center", 
+                           useShinyjs(),
+                           tags$style(appCSS),
+                           withBusyIndicatorUI(
+                             actionButton("deaButton", 
+                                          "Execute Differential Expression Analysis", 
+                                          class="btn-primary"))
+                       )
                      )
               ),
               fillCol(width = "100%", height = "100%", # 12,
-                     span("Dotplot Expression Analysis results:"),
+                     span("Differential Expression Analysis results:"),
                      wellPanel(id = "dea.res",
                                span("Volcano Plot:"),
                                plotOutput("volcano.plot")

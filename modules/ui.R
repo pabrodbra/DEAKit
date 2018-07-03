@@ -4,7 +4,7 @@
 # Load modules
 for(m in modules.tabs){
   print(paste("Loading ui module: ", m, sep=''))
-  source(paste("R/modules/", m, "/", m, "Panel.R", sep=''), local = TRUE)
+  source(paste("modules/", m, "/", m, "Panel.R", sep=''), local = TRUE)
 }
 
 # Define UI for application that draws a histogram
@@ -32,7 +32,7 @@ app.ui <- shinyUI(fluidPage(
               pathview.panel,
               #),
             
-              includeScript("R/www/js/mainFunctions.js")
+              includeScript("www/js/mainFunctions.js")
             )
   )
   )

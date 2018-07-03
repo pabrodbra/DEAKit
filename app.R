@@ -11,20 +11,31 @@ library(shiny)
 library(shinyjs)
 library(DT)
 #('shiny', 'shinyjs', 'DT')
-source('R/DEA_functions.R')
-
-# Load modules
-source('R/modules/modules.R', local = TRUE)
-source('R/modules/ui.R', local = TRUE)
-source('R/modules/server.R', local = TRUE)
+source('DEA_functions.R')
+source('helpers.R')
 
 # Setup
 SEED=12345
 set.seed(SEED)
-base.output.path <- "output/"
+
+# Output directories, only the name of the output files, no final '/'
+base.output.path <- "output-app"
+if(!file.exists(base.output.path)) dir.create(base.output.path, showWarnings = FALSE)
+
+img.output.path <- NULL
+if(is.null(img.output.path)) {
+  img.output.path <- file.path(base.output.path, "images")
+  dir.create(img.output.path, showWarnings = FALSE)
+} else if(!file.exists(img.output.path)) dir.create(img.output.path)
+
+
+# Load modules
+source('modules/modules.R', local = TRUE)
+source('modules/ui.R', local = TRUE)
+source('modules/server.R', local = TRUE)
 
 # Run app
-shinyApp( 
+shinyApp(
   ui = app.ui,
   server = app.server
 )

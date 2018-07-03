@@ -21,7 +21,15 @@ quality.control.panel <- tabPanel(title = "Quality Control",
                                                  
                                              ),
                                              
-                                             div(class="text-center", actionButton("qualityControlButton", "Generate plots", class="btn-primary"))
+                                             div(class="text-center", 
+                                                 useShinyjs(),
+                                                 tags$style(appCSS),
+                                                 withBusyIndicatorUI(
+                                                   actionButton("qualityControlButton", 
+                                                                "Generate plots", 
+                                                                class="btn-primary"))
+                                                 )
+                                                 
                                            )
                                     ),
                                     fillCol(width = "100%", height = "100%", #12,

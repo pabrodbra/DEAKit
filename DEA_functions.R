@@ -402,7 +402,7 @@ viewkeggpath <- function(path, enrichment, dea.p, output = "."){
   # dataframe with the genes and the log2FC
   kk <- filter(dea.p, gene.name %in% genesymbols) %>% 
     dplyr::select(gene.name, log2FoldChange)
-  kk <- kk %>%right_join(ll,by="gene.name")
+  kk <- kk %>% inner_join(ll,by="gene.name")
   gene.vector <- kk$log2FoldChange
   names(gene.vector) <- kk$geneid
   

@@ -6,12 +6,12 @@ normalization.panel <- tabPanel(title = "Normalization",
                                            div(class = "col-md-12",
                                                #div(class = "col-md-6",
                                                # RDS - Normalized metadata output
-                                               textInput("norm.metadata.path", "Normalized metadata output:", value = file.path(getwd(), "output/PCR-0-1_BMI_metadata.rds"),
+                                               textInput("norm.metadata.path", "Normalized metadata output:", value = file.path(getwd(), base.output.path, "PCR-0-1_BMI_metadata.rds"),
                                                          placeholder = "/home/userXY/output/normalized-metadata.rds"),
                                                helpText("Path of the output for the normalized metadata"),
                                                
                                                # RDS - Normalized count matrix output
-                                               textInput("norm.count.path", "Normalized count matrix output:", value = file.path(getwd(), "output/PCR-0-1_BMI_HK-normalized-counts.rds"),
+                                               textInput("norm.count.path", "Normalized count matrix output:", value = file.path(getwd(), base.output.path, "PCR-0-1_BMI_HK-normalized-counts.rds"),
                                                          placeholder = "/home/userXY/output/normalized-count.rds"),
                                                helpText("Path of the output for the normalized count matrix")
                                                ,
@@ -25,7 +25,14 @@ normalization.panel <- tabPanel(title = "Normalization",
                                                helpText("Binding Density maximum threshold")
                                            ),
                                            
-                                           div(class="text-center", actionButton("normalizeButton", "Normalize metadata and count matrix", class="btn-primary"))
+                                           div(class="text-center", 
+                                               useShinyjs(),
+                                               tags$style(appCSS),
+                                               withBusyIndicatorUI(
+                                                 actionButton("normalizeButton", 
+                                                              "Normalize metadata and count matrix", 
+                                                              class="btn-primary"))
+                                           )
                                          )
                                   ),
                                   fillCol(width = "100%", height = "100%", # 12, 

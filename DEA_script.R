@@ -244,7 +244,7 @@ colnames(ncounts) <- colnames(counts)
 
 # Plot post-normalization
 post.normalization.boxplot <- boxplot.count.matrix(ncounts, "Post-Normalization with Positive controls")
-pdf(file.path(DIR.OUTPUT, "Post-Normalization.pdf"))
+pdf(file.path(DIR.OUTPUT, "Positive-Normalization.pdf"))
 plot(post.normalization.boxplot + geom_hline(yintercept = lod,colour="red"))
 invisible(dev.off())
 
