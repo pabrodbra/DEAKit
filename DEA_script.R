@@ -44,11 +44,11 @@ option_list <- list(
   make_option(c("-u", "--functions"), action="store", type="character", default = "DEA_functions.R",
               dest="functions", help="Full path of the .R file containing the functions used in the script"),
   make_option(c("-o", "--output"), action="store", type="character",
-              dest="output", help="Output directory path. Optional, if not specified, an 'output' directory is created in the current directory"),
+              dest="output", help="Output full (not relative) directory path. Optional, if not specified, an 'output' directory is created in the current directory"),
   make_option(c("-z", "--images"), action="store", type="character",
-              dest="images", help="Output images directory path. Optional, if not specified an 'images' directory is created inside 'output' directory"),
+              dest="images", help="Output images full (not relative) directory path. Optional, if not specified an 'images' directory is created inside 'output' directory"),
   make_option(c("-y", "--docs"), action="store", type="character",
-              dest="docs", help="Output docs directory path. Optional, if not specified a 'docs' directory is created inside 'output' directory"),
+              dest="docs", help="Output docs full (not relative) directory path. Optional, if not specified a 'docs' directory is created inside 'output' directory"),
   make_option(c("-w", "--report"), action="store", type="character", default=file.path("reports", "DEA_report.Rmd"),
               dest="report", help="Full path of the .Rmd file used to create and html report inside 'docs' directory"),
   make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
@@ -342,10 +342,14 @@ if(opt$verbose) {
 
 
 # The core script for the pathway analysis expects a dataframe with the DEA named res
-res <- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design) 
+res <- getDE.raw(ncounts = round(ncounts), metadata = metadata, design = design)
+# Save res to use as input for pathfindR
+write_csv(res, file.path(getwd(), "pathfindR", paste0(opt$label, "_DEA_raw.csv")))
 
 # Setup ENTREZ - Takes time
-mart <- biomaRt::useMart(biomart = "ensembl", dataset = biomart_dataset)
+# Change between biomart argument ensembl and ENSEMBL_MART_ENSEMBL:
+# biomaRt::useMart(biomart = (*ensemble, ENSEMBL_MART_ENSEMBL*))
+mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL", dataset = biomart_dataset)
 entrez <- biomaRt::getBM(attributes = c("refseq_mrna", "entrezgene"), mart = mart)
 entrez$entrezgene <- as.character(entrez$entrezgene)
 entrezsymbol <- biomaRt::getBM(attributes = c("entrezgene", "hgnc_symbol"), mart = mart)

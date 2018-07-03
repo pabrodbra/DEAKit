@@ -393,7 +393,7 @@ ontology.enrichment.padjust.filter <- function(enrichment.summary, ontology = "k
 }
 
 # View KEGG Path
-viewkeggpath <- function(path, enrichment, dea.p, output = "."){
+viewkeggpath <- function(path, enrichment, dea.p, scale = TRUE, output = "."){
   # Get the genes in path from the enrichment summary
   genesymbols <- strsplit(as.character(enrichment[which(enrichment$ID ==path),12]), split = "/")[[1]]
   geneids <- strsplit(as.character(enrichment[which(enrichment$ID ==path),11]), split = "/")[[1]]
@@ -405,6 +405,11 @@ viewkeggpath <- function(path, enrichment, dea.p, output = "."){
   kk <- kk %>% inner_join(ll,by="gene.name")
   gene.vector <- kk$log2FoldChange
   names(gene.vector) <- kk$geneid
+  
+  # Scale to [-1, 1]
+  if(scale) {
+    gene.vector <- (2 / (max(gene.vector) - min(gene.vector))) * (gene.vector - min(gene.vector)) - 1
+  }
   
   pathview(gene.data=gene.vector, pathway.id=path, species="hsa", limit=list(gene=max(abs(gene.vector)), cpd=1), kegg.dir = output)
 }

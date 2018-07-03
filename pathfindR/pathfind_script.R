@@ -32,8 +32,8 @@ gds <- gene.dea.summary(dea.raw, adj.pval.threshold = 0.05)
 
 # Execute Enrichment Workflow
 setwd("pathfindR")
-result <- run_pathfindR(gds, p_val_threshold = 0.05, enrichment_threshold = 0.5,
-                        adj_method = "BH", search_method = "SA", iterations = 5, 
+result <- run_pathfindR(gds, p_val_threshold = 0.05, enrichment_threshold = 0.05,
+                        adj_method = "BH", search_method = "GR", iterations = 5, 
                         pin_name_path = "Biogrid")
 
 # Execute Clustering Workflow (it creates a shiny HTML document)
