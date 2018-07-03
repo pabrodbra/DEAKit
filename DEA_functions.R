@@ -409,12 +409,12 @@ viewkeggpath <- function(path, enrichment, dea.p, output = "."){
   pathview(gene.data=gene.vector, pathway.id=path, species="hsa", limit=list(gene=max(abs(gene.vector)), cpd=1), kegg.dir = output)
 }
 
-gene.dea.summary <- function(dea.results, pval.threshold = 0.05){
+gene.dea.summary <- function(dea.results, adj.pval.threshold = 0.05){
   ret.df <- data.frame(Gene.symbol = dea.results$rowname,
                        logFC = dea.results$log2FoldChange,
                        adj.P.Val = dea.results$pvalue,
                        stringsAsFactors = FALSE
-  ) %>% filter(adj.P.Val < pval.threshold) %>%
+  ) %>% filter(adj.P.Val < adj.pval.threshold) %>%
     tidyr::separate(Gene.symbol, c("type", "Gene.symbol"), sep="\\_")
   
   ret.df$type <- NULL
